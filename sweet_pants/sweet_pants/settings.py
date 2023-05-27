@@ -21,13 +21,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config.SECRET_KEY
+SECRET_KEY = os.environ.get("SECRET_KEY") or config.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(os.environ.get("DEBUG", default=1))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost:80","35.169.68.230:80", "ec2-35-169-68-230.compute-1.amazonaws.com", "35.169.68.230:443", "www.pinkman.ninja", "pinkman.ninja"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:80","http://35.169.68.230:80", "http://ec2-35-169-68-230.compute-1.amazonaws.com", "http://35.169.68.230:443", "http://www.pinkman.ninja", "http://pinkman.ninja"]
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+STATIC_URL = '/static/'
+# STATIC_ROOT = BASE_DIR / "staticfiles"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_ROOT = BASE_DIR / "mediafiles"
+MEDIA_URL = '/media/'
 
 # Application definition
 
@@ -91,12 +99,38 @@ WSGI_APPLICATION = 'sweet_pants.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+#         "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+#         "USER": os.environ.get("SQL_USER", "user"),
+#         "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+#         "HOST": os.environ.get("SQL_HOST", "localhost"),
+#         "PORT": os.environ.get("SQL_PORT", "5432"),
+#     }
+# }
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': config.engine,
+        'NAME': config.name, 
+        'USER': config.user,
+        'PASSWORD': config.password,
+        'HOST': config.host, 
+        'PORT': config.port,
+    }
+}
+
+
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+'''
 
 
 # Password validation
@@ -135,8 +169,6 @@ USE_TZ = False
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 
-STATIC_URL = 'static/'
-
 SITE_ID = 2
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -159,9 +191,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
-
 LOGIN_REDIRECT_URL = 'purpose'
 LOGIN_URL = 'account_login'
 
@@ -169,5 +198,4 @@ ACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_LOGIN_ON_GET=True
 ACCOUNT_FORMS = {'signup': 'users.forms.CustomSignupForm',}
 ACCOUNT_EMAIL_VERIFICATION = "none"
-
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' 
+ 
