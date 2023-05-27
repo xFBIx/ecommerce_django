@@ -1,0 +1,70 @@
+{% extends "mainpage/base_c.html" %}
+
+{% block title %}
+<title>Sweet Pants | Vendor Products</title>
+{% endblock title %}
+
+{% block content %}
+
+<section class="page-header">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="content">
+					<h1 class="page-name">Vendors</h1>
+					<ol class="breadcrumb">
+						<li><a href="{% url 'customer-homepage' %}">Home</a></li>
+						<li><a href="{% url 'vendors' %}">vendors</a></li>
+						<li class="active">vendor products</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+	<section class="products section bg-gray">
+		<div class="container">
+			<div class="row">
+				<div class="title text-center">
+					<h2>All Products by {{ vendor }}</h2>
+				</div>
+				<div class="top-menu text-right list-inline">
+					<h5>Sort by Highest Selling</h5>
+					<br>
+				</div>
+			</div>
+			<div class="row">
+			{% for product in products %}
+				<div class="col-md-4">
+					<div class="product-item">
+						<div class="product-thumb">
+							{% if product.discount %}<span class="bage">{{ product.discount }}% OFF</span>{% endif %}
+							<img class="img-responsive" src="{{ product.image.url }}" alt="product-img" />
+							<div class="preview-meta">
+								<ul>
+									<li>
+										<a href="{% url 'product-detail' product.id %}" ><i class="tf-ion-ios-search-strong"></i></a>
+									</li>
+									<li>
+										<a href="{% url 'add_to_wishlist' product.id %}" ><i class="tf-ion-ios-heart"></i></a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="product-content">
+							<h4><a href="{% url 'product-detail' product.id %}">{{ product.title }}</a></h4>
+							{% if product.discount %}
+							<p class="price"><span  style='text-decoration : line-through'>Rs.{{ product.price }}</span><span> Rs.{{ product.discounted_price }}</span></p>
+							{% else %}
+							<p class="price">Rs.{{ product.price }}</p>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+			</div>
+		</div>
+	</section>
+
+{% endblock content %}

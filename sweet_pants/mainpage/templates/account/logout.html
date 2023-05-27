@@ -1,0 +1,31 @@
+{% extends "mainpage/base_c.html" %}
+
+{% block title %}
+<title>Sweet Pants | Logout</title>
+{% endblock title %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <div class="block text-center">
+
+<h1>Sign Out</h1>
+
+<p>Are you sure you want to sign out?</p>
+
+<form method="post" action="{% url 'account_logout' %}">
+  {% csrf_token %}
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+  {% endif %}
+  <button class="btn btn-main btn-small btn-round" type="submit">Sign Out</button>
+</form>
+
+</div>
+</div>
+</div>
+</div>
+
+{% endblock content %}

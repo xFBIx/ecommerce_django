@@ -1,0 +1,319 @@
+{% load static %}
+{% load post_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs
+  ================================================== -->
+  <meta charset="utf-8">
+  {% block title %}{% endblock %}
+
+  <!-- Mobile Specific Metas
+  ================================================== -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Construction Html5 Template">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="author" content="Themefisher">
+  <meta name="generator" content="Themefisher Constra HTML Template v1.0">
+  
+  <!-- theme meta -->
+  <meta name="theme-name" content="aviato" />
+  
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/x-icon" href="{% static 'mainpage/images/favicon.png' %}" />
+  
+  <!-- Themefisher Icon font -->
+  <link rel="stylesheet" href="{% static 'mainpage/plugins/themefisher-font/style.css' %}">
+  <!-- bootstrap.min css -->
+  <link rel="stylesheet" href="{% static 'mainpage/plugins/bootstrap/css/bootstrap.min.css' %}">
+  
+  <!-- Animate css -->
+  <link rel="stylesheet" href="{% static 'mainpage/plugins/animate/animate.css' %}">
+  <!-- Slick Carousel -->
+  <link rel="stylesheet" href="{% static 'mainpage/plugins/slick/slick.css' %}">
+  <link rel="stylesheet" href="{% static 'mainpage/plugins/slick/slick-theme.css' %}">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="{% static 'mainpage/css/style.css' %}" >
+
+</head>
+
+<body id="body">
+
+<!-- Start Top Header Bar -->
+<section class="top-header">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4 col-xs-12 col-sm-4">
+				<div class="contact-number">
+					<i class="tf-ion-ios-telephone"></i>
+					<span>+91 9512493708</span>
+				</div>
+			</div>
+			<div class="col-md-4 col-xs-12 col-sm-4">
+				<!-- Site Logo -->
+				<div class="logo text-center">
+					<a href="{% url 'customer-homepage' %}">
+						<!-- replace logo here -->
+						<svg width="500px" height="29px" viewBox="170 0 155 31" version="1.1" xmlns="http://www.w3.org/2000/svg"
+							xmlns:xlink="http://www.w3.org/1999/xlink">
+							<g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" font-size="40"
+								font-family="Lucida Handwriting" font-weight="bold" >
+								<g id="Group" transform="translate(-108.000000, -297.000000)" fill="#000000">
+									<text id="AVIATO">
+										<tspan x="108.94" y="325">SWEET PANTS</tspan>
+									</text>
+								</g>
+							</g>
+						</svg>
+					</a>
+				</div>
+			</div>
+			<div class="col-md-4 col-xs-12 col-sm-4">
+				<ul class="top-menu text-right list-inline">
+
+					{% if user.is_authenticated %}
+					<li><a href="{% url 'profile' %}">Hello, {{ user.username }}</a></li>
+					<li><a href="{% url 'account_logout' %}">Logout</a></li>
+					{% else %}
+					<li><a href="{% url 'account_login' %}"> Login </a></li>
+					<li><a href="{% url 'account_signup' %}"> Sign Up </a></li>
+					{% endif %}
+
+					<!-- Search
+					<li class="dropdown search dropdown-slide">
+						<a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"><i
+								class="tf-ion-ios-search-strong"></i> Search</a>
+						<ul class="dropdown-menu search-dropdown">
+							<li>
+								<form action="post"><input type="search" class="form-control" placeholder="Search..."></form>
+							</li>
+						</ul>
+					</li>-->
+
+					<!-- Languages -->
+					<li class="commonSelect">
+						<select class="form-control">
+							<option>EN</option>
+							<option>DE</option>
+							<option>FR</option>
+							<option>ES</option>
+						</select>
+					</li><!-- / Languages -->
+
+				</ul><!-- / .nav .navbar-nav .navbar-right -->
+			</div>
+		</div>
+	</div>
+</section><!-- End Top Header Bar -->
+
+<!-- Main Menu Section -->
+<section class="menu">
+	<nav class="navbar navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<h2 class="menu-title">Main Menu</h2>
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+					aria-expanded="false" aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+
+			</div><!-- / .navbar-header -->
+
+			<!-- Navbar Links -->
+			<div id="navbar" class="navbar-collapse collapse text-center">
+				<ul class="nav navbar-nav">
+
+					<!-- Home -->
+					<li class="dropdown ">
+						<a href="{% url 'customer-homepage' %}">Home</a>
+					</li><!-- / Home -->
+
+					{% if request.user|has_group:'Vendor' %}
+					<!-- Add Product -->
+					<li class="dropdown ">
+						<a href="{% url 'product-create' %}">Add Product</a>
+					</li><!-- / Add Product -->
+					
+					<!-- All Orders -->
+					<li class="dropdown ">
+						<a href="{% url 'orders-vendor' %}">All Orders</a>
+					</li><!-- / All Orders -->
+					{% endif %}
+
+					{% if request.user|has_group:'Customer' or request.user|has_group:'nouser' %}
+					<!-- Vendors -->
+					<li class="dropdown ">
+						<a href="{% url 'vendors' %}">Vendors</a>
+					</li><!-- / Vendors -->
+					{% endif %}
+					
+					{% if request.user|has_group:'Customer' %}
+					<!-- Orders -->
+					<li class="dropdown ">
+						<a href="{% url 'orders-customer' %}">Orders</a>
+					</li><!-- / Orders -->
+
+					<li class="dropdown dropdown-slide">
+						<a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="350"
+							role="button" aria-haspopup="true" aria-expanded="false">Shop <span
+								class="tf-ion-ios-arrow-down"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="{% url 'wishlist' %}">Wishlist</a></li>
+							<li><a href="{% url 'shoppingcart' %}">Shopping Cart</a></li>
+							<li><a href="{% url 'checkout' %}">Checkout</a></li>
+						</ul>
+					</li>
+					{% endif %}
+
+					{% if request.user|has_group:'Customer' or request.user|has_group:'Vendor' %}
+					<li class="dropdown dropdown-slide">
+						<a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="350"
+							role="button" aria-haspopup="true" aria-expanded="false">Account Details <span
+								class="tf-ion-ios-arrow-down"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="{% url 'profile' %}">Profile Details</a></li>
+							<li><a href="{% url 'edit-profile' %}">EDIT Profile</a></li>
+							{% if request.user|has_group:'Vendor' %}
+							<li><a href="{% url 'profile' %}">Generate Coupon Code</a></li>
+							{% endif %}
+							<li><a href="#!">Change Password</a></li>
+						</ul>
+					</li>
+					{% endif %}
+
+					<li class="dropdown dropdown-slide">
+						<a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="350"
+							role="button" aria-haspopup="true" aria-expanded="false">Customer Care <span
+								class="tf-ion-ios-arrow-down"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="{% url 'contact' %}">Contact Us</a></li>
+							<li><a href="{% url 'about' %}">About Us</a></li>
+							<li><a href="{% url 'FAQ' %}">FAQ</a></li>
+						</ul>
+					</li>
+
+				</ul><!-- / .nav .navbar-nav -->
+
+			</div>
+			<!--/.navbar-collapse -->
+		</div><!-- / .container -->
+	</nav>
+</section>
+
+<div class="container">
+	{% if messages %}
+	{% for message in messages %}
+    <div class="alertPart mt-50">
+      <div class="alert alert-{{ message.tags }} alert-common alert-dismissible " role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <i class="tf-ion-thumbsup"></i>{{ message }}
+      </div>
+    </div>
+	{% endfor %}
+	{% endif %}
+</div>
+
+{% block content %}{% endblock %}
+
+<!--
+Start Call To Action
+==================================== -->
+<section class="call-to-action bg-gray section">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 text-center">
+				<div class="title">
+					<h2>SUBSCRIBE TO NEWSLETTER</h2>
+				</div>
+				<div class="col-lg-6 col-md-offset-3">
+				    <div class="input-group subscription-form">
+				      <input type="text" class="form-control" placeholder="Enter Your Email Address">
+				      <span class="input-group-btn">
+				        <button class="btn btn-main" type="button">Subscribe Now!</button>
+				      </span>
+				    </div><!-- /input-group -->
+			  </div><!-- /.col-lg-6 -->
+
+			</div>
+		</div> 		<!-- End row -->
+	</div>   	<!-- End container -->
+</section>   <!-- End section -->
+
+<footer class="footer section text-center">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<ul class="social-media">
+					<li>
+						<a href='https://instagram.com/rudradatt_2608?igshid=Y2M0YTlkZGNmOQ=='>
+							<i class="tf-ion-social-facebook"></i>
+						</a>
+					</li>
+					<li>
+						<a href='https://instagram.com/rudradatt_2608?igshid=Y2M0YTlkZGNmOQ=='>
+							<i class="tf-ion-social-instagram"></i>
+						</a>
+					</li>
+					<li>
+						<a href='https://instagram.com/rudradatt_2608?igshid=Y2M0YTlkZGNmOQ=='>
+							<i class="tf-ion-social-twitter"></i>
+						</a>
+					</li>
+					<li>
+						<a href='https://instagram.com/rudradatt_2608?igshid=Y2M0YTlkZGNmOQ=='>
+							<i class="tf-ion-social-pinterest"></i>
+						</a>
+					</li>
+				</ul>
+				<ul class="footer-menu text-uppercase">
+					<li>
+						<a href="{% url 'contact' %}">CONTACT</a>
+					</li>
+					<li>
+						<a href="{% url 'about' %}">ABOUT US</a>
+					</li>
+				</ul>
+				<p class="copyright-text">Copyright &copy;2023, Designed and Developed by Rudradatt Dave, Initiated by DVM </a></p>
+			</div>
+		</div>
+	</div>
+</footer>
+
+    <!-- 
+    Essential Scripts
+    =====================================-->
+    
+    <!-- Main jQuery -->
+    <script src="{% static 'mainpage/plugins/jquery/dist/jquery.min.js' %}"></script>
+    <!-- Bootstrap 3.1 -->
+    <script src="{% static 'mainpage/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+    <!-- Bootstrap Touchpin -->
+    <script src="{% static 'mainpage/plugins/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.js' %}"></script>
+    <!-- Instagram Feed Js -->
+    <script src="{% static 'mainpage/plugins/instafeed/instafeed.min.js' %}"></script>
+    <!-- Video Lightbox Plugin -->
+    <script src="{% static 'mainpage/plugins/ekko-lightbox/dist/ekko-lightbox.min.js' %}"></script>
+    <!-- Count Down Js -->
+    <script src="{% static 'mainpage/plugins/syo-timer/build/jquery.syotimer.min.js' %}"></script>
+
+    <!-- slick Carousel -->
+    <script src="{% static 'mainpage/plugins/slick/slick.min.js' %}"></script>
+    <script src="{% static 'mainpage/plugins/slick/slick-animation.min.js' %}"></script>
+
+    <!-- Google Mapl -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCC72vZw-6tGqFyRhhg5CkF2fqfILn2Tsw' %}"></script>
+    <script type="text/javascript" src="{% static 'mainpage/plugins/google-map/gmap.js' %}"></script>
+
+    <!-- Main Js File -->
+    <script src="{% static 'mainpage/js/script.js' %}"></script>
+    
+
+
+  </body>
+  </html>

@@ -1,0 +1,33 @@
+{% extends "mainpage/base_c.html" %}
+{% load static %}
+
+{% block title %}
+<title>Sweet Pants | Delete Product</title>
+{% endblock title %}
+
+{% block content %}
+
+<section class="signin-page account">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="block text-center">
+
+            <form method="POST">
+              {% csrf_token %}
+              <fieldset class="form-group">
+                  <legend class="border-bottom mb-4">DELETE PRODUCT</legend>
+                  <h2>Are you sure you want to delete the product? "{{ object.title }}"</h2>
+              </fieldset>
+              <div class="form-group">
+                <button class="btn btn-outline-danger" type="submit">Yes, Delete</button>
+                <a class="btn btn-outline-secondary" href="{% url 'product-detail' object.id %}">Cancel</a>
+              </div>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock content %}

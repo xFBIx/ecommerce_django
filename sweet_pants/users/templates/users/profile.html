@@ -1,0 +1,85 @@
+{% extends "mainpage/base_c.html" %}
+{% load static %}
+
+{% block title %}
+<title>Sweet Pants | Profile</title>
+{% endblock title %}
+
+{% block content %}
+
+<section class="page-header">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="content">
+					<h1 class="page-name">Dashboard</h1>
+					<ol class="breadcrumb">
+						<li><a href="{% url 'customer-homepage' %}">Home</a></li>
+						<li class="active">profile details</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<section class="user-dashboard page-wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <ul class="list-inline dashboard-menu text-center">
+		  <li><a class="active">Profile Details</a></li>
+          <li><a href="{% url 'edit-profile' %}">EDIT Profile</a></li>
+          <li><a href="#!">Change Password</a></li>
+        </ul>
+        <div class="dashboard-wrapper dashboard-user-profile">
+          <div class="media">
+            <div class="pull-left text-center" href="#!">
+              <img class="media-object user-img" src="{{ image }}" alt="Image" >
+            </div>
+            <div class="media-body">
+              <ul class="user-profile-list">
+                <li><span>Username:</span>{{ user.username }}</li>
+				        <br>
+                <li><span>Email:</span>{{ user.email }}</li>
+                <br>
+                {% if address %}
+                <li><span>Dilevery Address:</span>{{ address }}</li>
+                <br>
+                {% elif no_address %}
+                <li><span>Dilevery Address:</span>{{ no_address }}</li>
+                <br>
+                {% endif %}
+                {% if balance %}
+                <li><span>Account Balance:</span>{{ balance }}</li>
+                <br>
+                {% endif %}
+                {% if dis_coup or dis_coup == 0 %}
+                <li><span>Discount on Coupon Code: </span>{{ dis_coup }}%</li>
+                <br>
+                {% endif %}
+                {% if coupon %}
+                <li><span>Coupon Code:</span>{{ coupon }}</li>
+                <br>
+                <ul class="list-inline dashboard-menu text-center">
+                <li class="li"><a href="generate-coupon" class="btn btn-main btn-small btn-round">Generate New Coupon Code</a></li>
+                <li class="li"><a href="remove-coupon" class="btn btn-main btn-small btn-round">Remove Coupon Code</a></li>
+                </ul>
+                <br>
+                {% elif no_coupon %}
+                <li><span>Coupon Code:</span>{{ no_coupon }}</li>
+                <br>
+                <ul class="list-inline dashboard-menu text-center">
+                <li class="li"><a href="generate-coupon" class="btn btn-main btn-small btn-round">Generate Coupon Code</a></li>
+                </ul>
+                <br>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock content %}

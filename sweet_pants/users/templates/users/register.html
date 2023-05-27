@@ -1,0 +1,36 @@
+{% extends "mainpage/base_c.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+<title>Sweet Pants | Sign Up</title>
+{% endblock title %}
+
+{% block content %}
+
+<section class="signin-page account">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="block text-center">
+
+            <form method="POST">
+              {% csrf_token %}
+              <fieldset class="form-group">
+                  <legend class="border-bottom mb-4">Join Today</legend>
+                  {{ form|crispy}}
+              </fieldset>
+              <div class="form-group">
+                  <button class="btn btn-outline-info" type="submit">Sign Up</button>
+              </div>
+            </form>
+          
+          <p class="mt-20">Already have an account ? <a href="{% url 'login' %}">Login</a></p>
+          <p><a href="#!"> Forgot your password?</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock content %}

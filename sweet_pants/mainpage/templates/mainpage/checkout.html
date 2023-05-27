@@ -1,0 +1,128 @@
+{% extends "mainpage/base_c.html" %}
+
+{% block title %}
+<title>Sweet Pants | Checkout</title>
+{% endblock title %}
+
+{% block content %}
+
+<section class="page-header">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="content">
+					<h1 class="page-name">Checkout</h1>
+					<ol class="breadcrumb">
+						<li><a href="{% url 'customer-homepage' %}">Home</a></li>
+						<li class="active">checkout</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<div class="page-wrapper">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+        		<div class="">
+					<h3 class="post-title"><a href="blog-single.html">DILVERY ADDRESS</a></h3>
+					<div class="post-content">
+						{% if address %}
+						<h4>{{ address }}</h4>
+						{% else %}
+						<h4>{{ no_address }}</h4>
+						{% endif %}'
+						<h3 class="post-title"><a href="blog-single.html">AVAILABLE ACCOUNT BALANCE</a></h3>
+						<div class="post-content">
+						<h4>Rs.{{ balance }}</h4>
+						<br>
+						<a href="{% url 'edit-profile' %}" class="btn btn-main">Change Address or Account Balance</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% if items %}
+<div class="page-wrapper">
+  <div class="cart shopping">
+    <div class="container">
+      <div class="row">
+        <div class="">
+          <div class="block">
+            <div class="product-list">
+				<h3>ORDER SUMMARY</h3>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th class="">Product Name</th>
+                      <th class="">Product Price</th>
+                      <th class="">Quantity</th>
+					  <th class="">Vendor Name</th>
+                    </tr>
+                  </thead>
+				  {% for item in items %}
+                  <tbody>
+                    <tr class="">
+                      <td class="">
+                        <div class="product-info">
+                          <img width="80" src="{{ item.item.image.url }}" alt="" />
+                          <a href="{% url 'product-detail' item.item.id %}">{{ item.item.title }}</a>
+                        </div>
+                      </td>
+                      {% if item.item.discount %}
+                      <td class="">
+                        <a>Rs.{{ item.item.discounted_price }}</a>
+                      </td>
+                      {% else %}
+                      <td class="">Rs.{{ item.item.price }}</td>
+                      {% endif %}
+                      <td class="">
+                        <a>{{ item.quantity }}</a>
+                      </td>
+					  <td class="">
+						<a href="#!">{{ item.item.vendor }}</a>
+					  </td>
+					  <td class="">
+						{% if item.is_coupon %}
+						<a class="product-remove" href="{% url 'removecoupon' item.item.id %}">Remove Coupon Code</a>
+						{% else %}
+						<a href="{% url 'coupon' item.item.id %}">Apply Coupon here!</a>
+						{% endif %}
+					</td>
+                    </tr>
+                  </tbody>
+				  {% endfor %}
+				  <tbody>
+                    <tr class="">
+                      <td class="">Total Checkout Amount</td>
+					  <td class="">Rs.{{ total }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <a href="{% url 'buynow' %}" class="btn btn-main pull-right">Place Order</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<section class="empty-cart page-wrapper">
+	<div class="container">
+	  	<div class="row">
+			<div class="col-md-6 col-md-offset-3">
+		  		<div class="block text-center">
+			  		<i class="tf-ion-ios-cart-outline"></i>
+					<h2 class="text-center">Your Shopping Cart is currently empty.</h2>
+					<a href="{% url 'customer-homepage' %}" class="btn btn-main mt-20">Return to Shopping</a>
+				</div>
+	  		</div>
+		</div>
+</section>
+{% endif %}
+
+{% endblock content %}

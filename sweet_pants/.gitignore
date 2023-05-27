@@ -1,0 +1,5 @@
+.env
+*.pyc
+db.sqlite3
+sweet_pants/keyconfig.py
+*/migrations

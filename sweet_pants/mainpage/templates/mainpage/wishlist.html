@@ -1,0 +1,95 @@
+{% extends "mainpage/base_c.html" %}
+
+{% block title %}
+<title>Sweet Pants | Shopping Cart </title>
+{% endblock title %}
+
+{% block content %}
+
+<section class="page-header">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="content">
+					<h1 class="page-name">Wishlist</h1>
+					<ol class="breadcrumb">
+						<li><a href="{% url 'customer-homepage' %}">Home</a></li>
+						<li class="active">wishlist</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+{% if items %}
+<div class="page-wrapper">
+  <div class="cart shopping">
+    <div class="container">
+      <div class="row">
+        <div class="">
+          <div class="block">
+            <div class="product-list">
+              <form method="post">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th class="">Product Name</th>
+                      <th class="">Product Price</th>
+                      <th class="">Available Quantity</th>
+                      <th class="">Actions</th>
+                    </tr>
+                  </thead>
+				  {% for item in items %}
+                  <tbody>
+                    <tr class="">
+                      <td class="">
+                        <div class="product-info">
+                          <img width="80" src="{{ item.image.url }}" alt="" />
+                          <a href="{% url 'product-detail' item.id %}">{{ item.title }}</a>
+                        </div>
+                      </td>
+                      {% if item.discount %}
+                      <td class="">
+                        <a style='text-decoration : line-through'>Rs.{{ item.price }}</a>
+                        <a>Rs.{{ item.discounted_price }}</a>
+                      </td>
+                      {% else %}
+                      <td class="">Rs.{{ item.price }}</td>
+                      {% endif %}
+                      <td class="">{{ item.quantity }}</td>
+                      <td class="">
+                        <a href="{% url 'addtocart' item.id %}" >ADD to Shopping Cart</a>
+                      </td>
+                      <td class="">
+                        <a class="product-remove" href="{% url 'remove_wishlist' item.id %}">Remove</a>
+                      </td>
+                    </tr>
+                  </tbody>
+				  {% endfor %}
+                </table>
+                <a href="{% url 'shoppingcart' %}" class="btn btn-main pull-right">Go to Shopping Cart</a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<section class="empty-cart page-wrapper">
+	<div class="container">
+	  	<div class="row">
+			<div class="col-md-6 col-md-offset-3">
+		  		<div class="block text-center">
+			  		<i class="tf-ion-ios-cart-outline"></i>
+					<h2 class="text-center">Your Wishlist is currently empty.</h2>
+					<a href="{% url 'customer-homepage' %}" class="btn btn-main mt-20">Return to Shopping</a>
+				</div>
+	  		</div>
+		</div>
+</section>
+{% endif %}
+
+{% endblock content %}

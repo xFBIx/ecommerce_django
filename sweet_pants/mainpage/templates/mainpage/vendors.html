@@ -1,0 +1,66 @@
+{% extends "mainpage/base_c.html" %}
+
+{% block title %}
+<title>Sweet Pants | Vendors </title>
+{% endblock title %}
+
+{% block content %}
+
+<section class="page-header">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="content">
+					<h1 class="page-name">Vendors</h1>
+					<ol class="breadcrumb">
+						<li><a href="{% url 'customer-homepage' %}">Home</a></li>
+						<li class="active">vendors</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<div class="page-wrapper">
+  <div class="cart shopping">
+    <div class="container">
+      <div class="row">
+        <div class="">
+          <div class="block">
+            <div class="product-list">
+              <form method="post">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th class="">Vendor Name</th>
+                      <th class="">Email Address</th>
+                      <th class="">Products by this Vendor</th>
+                    </tr>
+                  </thead>
+				  {% for vendor in vendors %}
+                  <tbody>
+                    <tr class="">
+                      <td class="">
+                        <div class="product-info">
+                          <img width="80" src="{{ vendor.profile_vendor.image.url }}" alt="" />
+                          <a>{{ vendor.username }}</a>
+                        </div>
+                      <td class="">{{ vendor.email }}</td>
+                      <td class="">
+                        <a class="" href="{% url 'vendor_products' vendor.id %}">Products</a>
+                      </td>
+                    </tr>
+                  </tbody>
+				  {% endfor %}
+                </table>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

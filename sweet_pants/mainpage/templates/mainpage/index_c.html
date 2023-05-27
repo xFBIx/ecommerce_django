@@ -1,0 +1,156 @@
+{% extends "mainpage/base_c.html" %}
+
+{% block title %}
+{% if vendor %}
+<title>Sweet Pants | Vendor-Homepage</title>
+{% else %}
+<title>Sweet Pants | Customer-Homepage</title>
+{% endif %}
+{% endblock title %}
+
+{% block content %}
+
+<!-- CUSTOMER HOMEPAGE -->
+
+{% if customer %}
+	<section class="products section bg-gray">
+		<div class="container">
+			<div class="row">
+				<div class="title text-center">
+					<h2>All Products</h2>
+				</div>
+				<div class="top-menu text-right list-inline">
+					<h5>Sort by Highest Selling</h5>
+					<br>
+				</div>
+			</div>
+			<div class="row">
+			{% for product in customer_products %}
+				<div class="col-md-4">
+					<div class="product-item">
+						<div class="product-thumb">
+							{% if product.discount %}<span class="bage">{{ product.discount }}% OFF</span>{% endif %}
+							<img class="img-responsive" src="{{ product.image.url }}" alt="product-img" />
+							<div class="preview-meta">
+								<ul>
+									<li>
+										<a href="{% url 'product-detail' product.id %}" ><i class="tf-ion-ios-search-strong"></i></a>
+									</li>
+									<li>
+										<a href="{% url 'add_to_wishlist' product.id %}" ><i class="tf-ion-ios-heart"></i></a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="product-content">
+							<h4><a href="{% url 'product-detail' product.id %}">{{ product.title }}</a></h4>
+							{% if product.discount %}
+							<p class="price"><span  style='text-decoration : line-through'>Rs.{{ product.price }}</span><span> Rs.{{ product.discounted_price }}</span></p>
+							{% else %}
+							<p class="price">Rs.{{ product.price }}</p>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+			</div>
+
+		<div class="block text-center">
+		{% if customer_products.has_other_pages %}
+
+		{% if customer_products.has_previous %}
+		  <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+		  <a class="btn btn-outline-info mb-4" href="?page={{ customer_products.previous_page_number }}">Previous</a>
+		{% endif %}
+  
+		{% for num in customer_products.paginator.page_range %}
+		  {% if customer_products.number == num %}
+			<a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+		  {% elif num > customer_products.number|add:'-3' and num < customer_products.number|add:'3' %}
+			<a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+		  {% endif %}
+		{% endfor %}
+  
+		{% if customer_products.has_next %}
+		  <a class="btn btn-outline-info mb-4" href="?page={{ customer_products.next_page_number }}">Next</a>
+		  <a class="btn btn-outline-info mb-4" href="?page={{ customer_products.paginator.num_pages }}">Last</a>
+		{% endif %}
+  
+		  {% endif %}
+		</div>
+
+		</div>
+	</section>
+{% endif %}
+
+<!-- VENDOR HOMEPAGE -->
+
+{% if vendor %}
+	<section class="products section bg-gray">
+		<div class="container">
+			<div class="row">
+				<div class="title text-center">
+					<h2>Your Products</h2>
+				</div>
+				<div class="top-menu text-right list-inline">
+					<h5>Sort by Highest Selling</h5>
+					<br>
+				</div>
+			</div>
+			<div class="row">
+			{% for product in vendor_products %}
+				<div class="col-md-4">
+					<div class="product-item">
+						<div class="product-thumb">
+							{% if product.discount %}<span class="bage">{{ product.discount }}% OFF</span>{% endif %}
+							<img class="img-responsive" src="{{ product.image.url }}" alt="product-img" />
+							<div class="preview-meta">
+								<ul>
+									<li>
+										<a href="{% url 'product-detail' product.id %}" ><i class="tf-ion-ios-search-strong"></i></a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="product-content">
+							<h4><a href="{% url 'product-detail' product.id %}">{{ product.title }}</a></h4>
+							{% if product.discount %}
+							<p class="price"><span  style='text-decoration : line-through'>Rs.{{ product.price }}</span><span> Rs.{{ product.discounted_price }}</span></p>
+							{% else %}
+							<p class="price">Rs.{{ product.price }}</p>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+			</div>
+			
+			<div class="block text-center">
+			{% if vendor_products.has_other_pages %}
+
+		{% if vendor_products.has_previous %}
+		  <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+		  <a class="btn btn-outline-info mb-4" href="?page={{ vendor_products.previous_page_number }}">Previous</a>
+		{% endif %}
+  
+		{% for num in vendor_products.paginator.page_range %}
+		  {% if vendor_products.number == num %}
+			<a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+		  {% elif num > vendor_products.number|add:'-3' and num < vendor_products.number|add:'3' %}
+			<a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+		  {% endif %}
+		{% endfor %}
+  
+		{% if vendor_products.has_next %}
+		  <a class="btn btn-outline-info mb-4" href="?page={{ vendor_products.next_page_number }}">Next</a>
+		  <a class="btn btn-outline-info mb-4" href="?page={{ vendor_products.paginator.num_pages }}">Last</a>
+		{% endif %}
+  
+		  {% endif %}
+			</div>
+
+		</div>
+	</section>
+{% endif %}
+
+{% endblock content %}
