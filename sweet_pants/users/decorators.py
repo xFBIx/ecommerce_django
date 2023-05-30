@@ -5,9 +5,12 @@ from django.contrib.auth.mixins import AccessMixin
 
 def is_purpose(view_func):
     def wrapped_func(request, *args, **kwargs):
-        if Group.objects.filter(user = request.user):
+        try :
+            if Group.objects.filter(user = request.user):
+                return view_func(request, *args, **kwargs)
+            return redirect('purpose')
+        except:
             return view_func(request, *args, **kwargs)
-        return redirect('purpose')
     return wrapped_func
 
 def purpose(view_func):
@@ -40,6 +43,21 @@ class VendorRequiredMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
-        elif request.user.is_authenticated and not request.user.groups.all()[0].name == 'Vendor':
-            return redirect ('customer-homepage')
+        else:
+            try:
+                if not request.user.groups.all()[0].name == 'Vendor':
+                    return redirect ('customer-homepage')
+            except:
+                return redirect('purpose')
+            
         return super().dispatch(request, *args, **kwargs)
+    
+class PurposeRequiredMixin(AccessMixin):
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            if Group.objects.filter(user = request.user) :
+                return super().dispatch(request, *args, **kwargs)
+            else:
+                return redirect('purpose')
+        except:
+            return super().dispatch(request, *args, **kwargs)

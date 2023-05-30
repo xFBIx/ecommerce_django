@@ -2,18 +2,28 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.core.validators import MinValueValidator
+from PIL import Image
 
 
 class Product(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
-    image = models.ImageField(default='default.jpg', upload_to='product_pics')
+    image = models.ImageField(null=True, blank=True, upload_to='product_pics')
     vendor = models.ForeignKey(User, on_delete=models.CASCADE)
     price = models.FloatField(validators = [MinValueValidator(0.0)], null= False, blank= False)
     quantity = models.PositiveIntegerField(null= False, blank= False)
     discount = models.PositiveIntegerField(default=0)
     sales = models.PositiveIntegerField(default=0)
     discounted_price = models.FloatField(default=0)
+    
+    def save(self, *args, **kwargs):
+        super(Product, self).save(*args, **kwargs)
+        if self.image:
+            img = Image.open(self.image.path)
+            if img.height > 600 or img.width > 500:
+                output_size = (600, 500)
+                img.thumbnail(output_size)
+                img.save(self.image.path)
     
     def __str__(self):
         return self.title

@@ -1,4 +1,5 @@
 {% extends "mainpage/base_c.html" %}
+{% load static %}
 
 {% block title %}
 <title>Sweet Pants | Vendors </title>
@@ -43,7 +44,11 @@
                     <tr class="">
                       <td class="">
                         <div class="product-info">
-                          <img width="80" src="{{ vendor.profile_vendor.image.url }}" alt="" />
+                          {% if vendor.profile_vendor.image %}
+							            <img width="80" src="{{ vendor.profile_vendor.image.url }}" alt="" />
+							            {% else %}
+                          <img width="80" src="{% static 'mainpage/images/default.jpg' %}" alt="" />
+						            	{% endif %}
                           <a>{{ vendor.username }}</a>
                         </div>
                       <td class="">{{ vendor.email }}</td>

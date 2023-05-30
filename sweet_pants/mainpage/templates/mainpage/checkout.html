@@ -1,4 +1,5 @@
 {% extends "mainpage/base_c.html" %}
+{% load static %}
 
 {% block title %}
 <title>Sweet Pants | Checkout</title>
@@ -26,7 +27,7 @@
 		<div class="row">
 			<div class="col-md-12">
         		<div class="">
-					<h3 class="post-title"><a href="blog-single.html">DILVERY ADDRESS</a></h3>
+					<h3 class="post-title"><a href="blog-single.html">DELIVERY ADDRESS</a></h3>
 					<div class="post-content">
 						{% if address %}
 						<h4>{{ address }}</h4>
@@ -68,7 +69,11 @@
                     <tr class="">
                       <td class="">
                         <div class="product-info">
-                          <img width="80" src="{{ item.item.image.url }}" alt="" />
+							{% if item.item.image %}
+							<img width="80" src="{{ item.item.image.url }}" alt="" />
+				            {% else %}
+                            <img width="80" src="{% static 'mainpage/images/default-product.jpeg' %}" alt="" />
+			            	{% endif %}
                           <a href="{% url 'product-detail' item.item.id %}">{{ item.item.title }}</a>
                         </div>
                       </td>

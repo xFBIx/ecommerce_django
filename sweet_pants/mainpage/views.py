@@ -4,7 +4,7 @@ from django.views.generic import (ListView, DetailView, CreateView, UpdateView, 
 from .models import Product, Items, Review
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-from users.decorators import VendorRequiredMixin, is_purpose
+from users.decorators import VendorRequiredMixin, is_purpose, PurposeRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from users.decorators import allowed_users
@@ -28,15 +28,9 @@ def about(request):
 def FAQ(request):
     return render(request, 'mainpage/faq.html')
     
-class ProductListView(UserPassesTestMixin, ListView):
+class ProductListView(PurposeRequiredMixin, ListView):
     model = Product
     template_name = 'mainpage/index_c.html'
-    
-    def test_func(self):
-        if self.request.user.is_authenticated and not Group.objects.filter(user = self.request.user):
-            return False
-        else:
-            return True
     
     def get_context_data(self,*args, **kwargs):
         context = super(ProductListView, self).get_context_data(*args,**kwargs)
@@ -73,7 +67,7 @@ class ProductListView(UserPassesTestMixin, ListView):
         context['vendor_products'] = userss
         return context
 
-class ProductDetailView(UserPassesTestMixin, DetailView):
+class ProductDetailView(PurposeRequiredMixin, UserPassesTestMixin, DetailView):
     model = Product
     template_name = 'mainpage/product_detail.html'
     
@@ -142,17 +136,20 @@ class ProductDeleteView(VendorRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         return False
 
+@is_purpose
 @allowed_users(allowed_roles='notvendor')
 def vendors(request):
     context = {'vendors' : User.objects.all().filter(groups__name='Vendor') }
     return render(request, 'mainpage/vendors.html', context)
 
+@is_purpose
 @allowed_users(allowed_roles='notvendor')
 def vendor_products(request, pk):
     context = {'products': Product.objects.all().filter( vendor = pk).order_by('-sales'), 'vendor': User.objects.all().filter(id=pk).first()}
     return render(request, 'mainpage/vendor_products.html', context)
 
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')
 def add_to_wishlist(request, pk):
     item = Product.objects.filter(id=pk).first()
@@ -164,6 +161,7 @@ def add_to_wishlist(request, pk):
     return redirect('customer-homepage')
 
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')
 def remove_wishlist(request, pk):
     item_to_remove = Product.objects.filter(id=pk).first()
@@ -175,18 +173,21 @@ def remove_wishlist(request, pk):
         return redirect('customer-homepage')
     
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')
 def shoppingcart(request):
     context = {'items' : request.user.shoppingcart.orderitems.all().filter(is_ordered=False), 'total': request.user.shoppingcart.get_cart_total()  }
     return render(request, 'mainpage/shoppingcart.html', context)
 
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')
 def wishlist(request):
     context = {'items' : request.user.wishlist.items.all()}
     return render(request, 'mainpage/wishlist.html', context)
 
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')
 def remove_shoppingcart(request, pk):
     product = Product.objects.filter(id=pk).first()
@@ -197,6 +198,7 @@ def remove_shoppingcart(request, pk):
     return redirect('shoppingcart')
 
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')
 def checkout(request):
     context = {'address': request.user.profile_customer.address , 'no_address' : 'Please add an address before placing order!', 
@@ -205,6 +207,7 @@ def checkout(request):
     return render(request, 'mainpage/checkout.html', context)
 
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')
 def coupon(request, pk):
     product = Product.objects.filter(id=pk).first()
@@ -226,6 +229,7 @@ def coupon(request, pk):
         return render(request, 'mainpage/coupon.html')
 
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')
 def addtocart(request, pk):
     product = Product.objects.filter(id=pk).first()
@@ -246,6 +250,7 @@ def addtocart(request, pk):
     return render(request, 'mainpage/addtocart.html')
 
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')
 def updatecart(request, pk):
     product = Product.objects.filter(id=pk).first()
@@ -265,6 +270,7 @@ def updatecart(request, pk):
     return render(request, 'mainpage/updatecart.html')
     
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')
 def removecoupon(request, pk):
     product = Product.objects.filter(id=pk).first()
@@ -289,6 +295,7 @@ def mail(vendor_email,vendor,customer,quantity,product,amount):
     mailjet.send.create(data=data)
 
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')
 def buynow(request):
     if request.user.shoppingcart.orderitems.all().filter(is_ordered=False):
@@ -322,12 +329,14 @@ def buynow(request):
         return redirect('customer-homepage')
     
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')  
 def orderscustomer(request):    
     context = {'orders': request.user.shoppingcart.orderitems.filter(is_ordered = True).order_by('-orderdate')}
     return render(request, 'mainpage/orders-customer.html', context)
 
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Vendor')
 def ordersvendor(request):
     items = Items.objects.filter(is_ordered = True).order_by('-orderdate')
@@ -339,6 +348,7 @@ def ordersvendor(request):
     return render(request, 'mainpage/orders-vendor.html', context)
 
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Customer')
 def review(request, pk):
     product = Product.objects.filter(id=pk).first()
@@ -355,6 +365,7 @@ def review(request, pk):
         return redirect('orders-customer')
     
 @login_required
+@is_purpose
 @allowed_users(allowed_roles='Vendor')
 def download_orders(request):
     rawdata = VendorResource()

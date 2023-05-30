@@ -73,11 +73,15 @@ def register(request):
 @is_purpose
 def profile(request):
     if request.user.groups.all()[0].name == 'Customer' :
-        context = {'image' : request.user.profile_customer.image.url, 'address' : request.user.profile_customer.address,
+        context = {'address' : request.user.profile_customer.address,
                    'balance' : request.user.profile_customer.balance , 'no_address' : 'No Address !' }
+        if request.user.profile_customer.image:
+            context['image'] =  request.user.profile_customer.image.url
     elif request.user.groups.all()[0].name == 'Vendor' :
-        context = {'image' : request.user.profile_vendor.image.url, 'coupon' : request.user.profile_vendor.coupon,
+        context = {'coupon' : request.user.profile_vendor.coupon,
                    'no_coupon' : 'No Coupon Code!', 'dis_coup' : request.user.profile_vendor.discount_on_coupon_code }
+        if request.user.profile_vendor.image:
+            context['image'] =  request.user.profile_vendor.image.url
     return render(request, 'users/profile.html', context)
 
 @login_required

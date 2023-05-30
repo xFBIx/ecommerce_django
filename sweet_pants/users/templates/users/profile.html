@@ -33,7 +33,11 @@
         <div class="dashboard-wrapper dashboard-user-profile">
           <div class="media">
             <div class="pull-left text-center" href="#!">
+              {% if image %}
               <img class="media-object user-img" src="{{ image }}" alt="Image" >
+              {% else %}
+              <img class="media-object user-img" src="{% static 'mainpage/images/default.jpg' %}" alt="Image" >
+              {% endif %}
             </div>
             <div class="media-body">
               <ul class="user-profile-list">

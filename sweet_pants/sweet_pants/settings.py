@@ -26,15 +26,15 @@ SECRET_KEY = os.environ.get("SECRET_KEY") or config.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get("DEBUG", default=1))
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost:80","35.169.68.230:80", "ec2-35-169-68-230.compute-1.amazonaws.com", "35.169.68.230:443", "www.pinkman.ninja", "pinkman.ninja"]
-CSRF_TRUSTED_ORIGINS = ["http://localhost:80","http://35.169.68.230:80", "http://ec2-35-169-68-230.compute-1.amazonaws.com", "http://35.169.68.230:443", "http://www.pinkman.ninja", "http://pinkman.ninja"]
+ALLOWED_HOSTS = ["127.0.0.1", "www.pinkman.ninja"]
+CSRF_TRUSTED_ORIGINS = ["http://www.pinkman.ninja"]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# MEDIA_ROOT = BASE_DIR / "mediafiles"
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / "mediafiles"
 MEDIA_URL = '/media/'
 
 # Application definition
@@ -99,19 +99,19 @@ WSGI_APPLICATION = 'sweet_pants.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-#         "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
-#         "USER": os.environ.get("SQL_USER", "user"),
-#         "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-#         "HOST": os.environ.get("SQL_HOST", "localhost"),
-#         "PORT": os.environ.get("SQL_PORT", "5432"),
-#     }
-# }
-
-
 DATABASES = {
+    "default": {
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
+    }
+}
+
+
+'''DATABASES = {
     'default': {
         'ENGINE': config.engine,
         'NAME': config.name, 
@@ -120,7 +120,7 @@ DATABASES = {
         'HOST': config.host, 
         'PORT': config.port,
     }
-}
+}'''
 
 
 '''

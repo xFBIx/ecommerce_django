@@ -1,5 +1,6 @@
 {% extends "mainpage/base_c.html" %}
 {% load post_tags %}
+{% load static %}
 
 {% block title %}
 <title>Sweet Pants | Product Details</title>
@@ -23,7 +24,11 @@
 							<!-- me art lab slider -->
 							<div class='carousel-inner '>
 								<div class='item active'>
+									{% if object.image %}
 									<img src='{{ object.image.url }}' alt='' />
+									{% else %}
+									<img src='{% static 'mainpage/images/default-product.jpeg' %}' alt='' />
+									{% endif %}
 								</div>
 							</div>
 						</div>
@@ -140,7 +145,11 @@
 									{% for i in object.reviews.all %}
 								    <li class="media">
 										<a class="pull-left">
-								            <img class="media-object comment-avatar" src="{{ i.customer.profile_customer.image.url }}" alt="" width="50" height="50" />
+											{% if i.customer.profile_customer.image %}
+											<img class="media-object comment-avatar" src="{{ i.customer.profile_customer.image.url }}" alt="" width="50" height="50" />
+											{% else %}
+											<img class="media-object comment-avatar" src="{% static 'mainpage/images/default.jpg' %}" alt="" width="50" height="50" />
+											{% endif %}
 								        </a>
 								        <div class="media-body">
 								            <div class="comment-info">

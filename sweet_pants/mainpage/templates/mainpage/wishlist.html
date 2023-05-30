@@ -1,4 +1,5 @@
 {% extends "mainpage/base_c.html" %}
+{% load static %}
 
 {% block title %}
 <title>Sweet Pants | Shopping Cart </title>
@@ -45,7 +46,11 @@
                     <tr class="">
                       <td class="">
                         <div class="product-info">
+                          {% if item.image %}
                           <img width="80" src="{{ item.image.url }}" alt="" />
+				                   {% else %}
+                           <img width="80" src="{% static 'mainpage/images/default-product.jpeg' %}" alt="" />
+			                  	{% endif %}
                           <a href="{% url 'product-detail' item.id %}">{{ item.title }}</a>
                         </div>
                       </td>

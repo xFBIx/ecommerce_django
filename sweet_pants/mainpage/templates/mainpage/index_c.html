@@ -1,10 +1,14 @@
 {% extends "mainpage/base_c.html" %}
+{% load post_tags %}
+{% load static %}
 
 {% block title %}
-{% if vendor %}
-<title>Sweet Pants | Vendor-Homepage</title>
-{% else %}
-<title>Sweet Pants | Customer-Homepage</title>
+{% if request.user|has_group:'nouser' %}
+<title>Sweet Pants | Homepage</title>
+{% elif request.user|has_group:'Customer'  %}
+<title>Sweet Pants | Customer Homepage</title>
+{% elif request.user|has_group:'Vendor' %}
+<title>Sweet Pants | Vendor Homepage</title>
 {% endif %}
 {% endblock title %}
 
@@ -28,9 +32,13 @@
 			{% for product in customer_products %}
 				<div class="col-md-4">
 					<div class="product-item">
-						<div class="product-thumb">
+						<div class="product-thumb" style="height:60vh;">
 							{% if product.discount %}<span class="bage">{{ product.discount }}% OFF</span>{% endif %}
-							<img class="img-responsive" src="{{ product.image.url }}" alt="product-img" />
+							{% if product.image %}
+							<img class="img-responsive" style="height:60vh;" src="{{ product.image.url }}" alt="product-img" />
+							{% else %}
+							<img class="img-responsive" style="height:60vh;" src="{% static 'mainpage/images/default-product.jpeg' %}" alt="product-img" />
+							{% endif %}
 							<div class="preview-meta">
 								<ul>
 									<li>
@@ -86,6 +94,7 @@
 <!-- VENDOR HOMEPAGE -->
 
 {% if vendor %}
+{% if vendor_products %}
 	<section class="products section bg-gray">
 		<div class="container">
 			<div class="row">
@@ -101,9 +110,13 @@
 			{% for product in vendor_products %}
 				<div class="col-md-4">
 					<div class="product-item">
-						<div class="product-thumb">
+						<div class="product-thumb" style="height:50vh;">
 							{% if product.discount %}<span class="bage">{{ product.discount }}% OFF</span>{% endif %}
-							<img class="img-responsive" src="{{ product.image.url }}" alt="product-img" />
+							{% if product.image %}
+							<img class="img-responsive" style="height:50vh;" src="{{ product.image.url }}" alt="product-img" />
+							{% else %}
+							<img class="img-responsive" style="height:50vh;" src="{% static 'mainpage/images/default-product.jpeg' %}" alt="product-img" />
+							{% endif %}
 							<div class="preview-meta">
 								<ul>
 									<li>
@@ -151,6 +164,19 @@
 
 		</div>
 	</section>
+{% else %}
+<section class="empty-cart page-wrapper">
+	<div class="container">
+	  	<div class="row">
+			<div class="col-md-6 col-md-offset-3">
+		  		<div class="block text-center">
+					<h2 class="text-center">You have no products, add a product to sell.</h2>
+					<a href="{% url 'product-create' %}" class="btn btn-main mt-20">ADD PRODUCT</a>
+				</div>
+	  		</div>
+		</div>
+</section>
+{% endif %}
 {% endif %}
 
 {% endblock content %}

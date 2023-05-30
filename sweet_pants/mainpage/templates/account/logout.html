@@ -6,6 +6,7 @@
 
 {% block content %}
 
+<section class="signin-page account">
 <div class="container">
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
@@ -21,11 +22,13 @@
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
   {% endif %}
   <button class="btn btn-main btn-small btn-round" type="submit">Sign Out</button>
+  <a href="{% url 'customer-homepage' %}">&nbsp&nbsp CANCEL</a>
 </form>
 
 </div>
 </div>
 </div>
 </div>
+</section>
 
 {% endblock content %}
