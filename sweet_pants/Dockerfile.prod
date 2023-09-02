@@ -1,3 +1,6 @@
+# Here, we used a Docker multi-stage build to reduce the final image size. Essentially, builder is a temporary image that's used for building 
+# the Python wheels. The wheels are then copied over to the final production image and the builder image is discarded.
+
 ###########
 # BUILDER #
 ###########
