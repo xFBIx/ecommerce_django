@@ -1,13 +1,7 @@
 from mailjet_rest import Client
 
-MJ_APIKEY_PUBLIC = "b7f3524a9dbc88bbe6d4c684abd0fd60"
-MJ_APIKEY_PRIVATE = "7db34a3b4b68c6011b4aebbd4b684b25"
-
-# MJ_APIKEY_PUBLIC = "53e52492564bd7b965a53e9ac345611a"
-# MJ_APIKEY_PRIVATE = "3253cf095d0994000379a401297fecf6"
-
-# MJ_APIKEY_PUBLIC = "f97f3e5ff37d27e280edfe7fa38e7b6f"
-# MJ_APIKEY_PRIVATE = "5fd04d48834b2eba56edeab281462b6a"
+MJ_APIKEY_PUBLIC = ""
+MJ_APIKEY_PRIVATE = ""
 
 
 def mail(vendor_email, vendor):
