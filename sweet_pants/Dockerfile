@@ -23,7 +23,6 @@ RUN mkdir -p /opt/project/staticfiles
 RUN mkdir -p /opt/project/mediafiles
 
 # Copy project files
-COPY ["README.rst", "./"]
 COPY sweet_pants sweet_pants
 
 # Expose the Django development server port (adjust if needed)
