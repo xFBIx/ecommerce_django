@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+  db_sweet_pants:
+    container_name: postgresdb-sweet_pants
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: sweet_pants
+      POSTGRES_USER: sweet_pants
+      POSTGRES_PASSWORD: sweet_pants
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+
+  web:
+    container_name: web-sweet_pants
+    build: .
+    command: gunicorn sweet_pants.wsgi:application --bind 0.0.0.0:3000 --workers=1 --timeout 600 --reload
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+    depends_on:
+      - db_sweet_pants
+    volumes:
+      - staticfiles:/opt/project/staticfiles
+      - mediafiles:/opt/project/media
+      - .:/opt/project
+
+  nginx:
+    container_name: nginx-sweet_pants
+    build: ./nginx
+    restart: always
+    ports:
+      - "1370:30"
+    volumes:
+      - staticfiles:/opt/project/staticfiles
+      - mediafiles:/opt/project/mediafiles
+    depends_on:
+      - web
+
+volumes:
+  postgresql-data:
+  staticfiles:
+  mediafiles:
