@@ -44,6 +44,10 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 STATIC_ROOT = "/opt/project/staticfiles"
 STATIC_URL = "/ecommerce/static/"
+STATICFILES_DIRS = [
+    '/opt/project/staticfiles/',
+    # other directories if any
+]
 
 MEDIA_ROOT = "/opt/project/mediafiles"
 MEDIA_URL = "/ecommerce/media/"

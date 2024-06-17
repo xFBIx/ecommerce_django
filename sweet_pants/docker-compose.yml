@@ -35,7 +35,7 @@ services:
     build: ./nginx
     restart: always
     ports:
-      - "1370:30"
+      - "1370:80"
     volumes:
       - staticfiles:/opt/project/staticfiles
       - mediafiles:/opt/project/mediafiles
