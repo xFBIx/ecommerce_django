@@ -39,7 +39,7 @@ class Product(models.Model):
 class Items(models.Model):
     customer = models.ForeignKey(User, default=1, on_delete=models.CASCADE)
     item = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
+    quantity = models.PositiveIntegerField(validators=[MinValueValidator(0)], default=1)
     is_ordered = models.BooleanField(default=False)
     orderdate = models.DateTimeField(null=True, blank=True)
     is_coupon = models.BooleanField(default=False)
