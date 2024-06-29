@@ -37,12 +37,46 @@ def FAQ(request):
     return render(request, "mainpage/faq.html")
 
 
+from django.db.models import Q
+
 class ProductListView(PurposeRequiredMixin, ListView):
     model = Product
     template_name = "mainpage/index_c.html"
 
+    def get_queryset(self):
+        queryset = Product.objects.all()
+        
+        search = self.request.GET.get('search')
+        categories = self.request.GET.getlist('category')
+        locations = self.request.GET.getlist('location')
+        min_price = self.request.GET.get('min_price')
+        max_price = self.request.GET.get('max_price')
+
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(category__icontains=search) |
+                Q(location__icontains=search)
+            )
+
+        if categories:
+            queryset = queryset.filter(category__in=categories)
+        
+        if locations:
+            queryset = queryset.filter(location__in=locations)
+        
+        if min_price:
+            queryset = queryset.filter(price__gte=float(min_price))
+        
+        if max_price:
+            queryset = queryset.filter(price__lte=float(max_price))
+
+        return queryset.order_by('-sales').distinct()
+
     def get_context_data(self, *args, **kwargs):
         context = super(ProductListView, self).get_context_data(*args, **kwargs)
+        
+        # Existing context logic
         if self.request.user.groups.all():
             if self.request.user.groups.all()[0].name == "Vendor":
                 context["vendor"] = "vendor"
@@ -51,7 +85,7 @@ class ProductListView(PurposeRequiredMixin, ListView):
         else:
             context["customer"] = "customer"
 
-        user_list = Product.objects.all().order_by("-sales")
+        user_list = self.get_queryset()
         page = self.request.GET.get("page", 1)
 
         paginator = Paginator(user_list, 6)
@@ -63,19 +97,39 @@ class ProductListView(PurposeRequiredMixin, ListView):
             users = paginator.page(paginator.num_pages)
         context["customer_products"] = users
 
-        userr_list = (
-            Product.objects.all().filter(vendor=self.request.user.id).order_by("-sales")
-        )
-        pagee = self.request.GET.get("page", 1)
+        if self.request.user.is_authenticated:
+            userr_list = self.get_queryset().filter(vendor=self.request.user.id)
+            pagee = self.request.GET.get("page", 1)
 
-        paginatorr = Paginator(userr_list, 3)
-        try:
-            userss = paginatorr.page(pagee)
-        except PageNotAnInteger:
-            userss = paginatorr.page(1)
-        except EmptyPage:
-            userss = paginatorr.page(paginatorr.num_pages)
-        context["vendor_products"] = userss
+            paginatorr = Paginator(userr_list, 3)
+            try:
+                userss = paginatorr.page(pagee)
+            except PageNotAnInteger:
+                userss = paginatorr.page(1)
+            except EmptyPage:
+                userss = paginatorr.page(paginatorr.num_pages)
+            context["vendor_products"] = userss
+
+        # Add these lines
+        CATEGORY_CHOICES = [
+            ("Sofas", "Sofas"),
+            ("Chairs", "Chairs"),
+            ("Tables", "Tables"),
+            ("Beds", "Beds"),
+            ("Cupboards", "Cupboards"),
+        ]
+        LOCATION_CHOICES = [
+            ("Ahmedabad", "Ahmedabad"),
+            ("Bangalore", "Bangalore"),
+            ("Delhi", "Delhi"),
+            ("Mumbai", "Mumbai"),
+            ("Pune", "Pune"),
+        ]
+        context['selected_categories'] = self.request.GET.getlist('category')
+        context['selected_locations'] = self.request.GET.getlist('location')
+        context['CATEGORY_CHOICES'] = CATEGORY_CHOICES
+        context['LOCATION_CHOICES'] = LOCATION_CHOICES
+
         return context
 
 
@@ -122,7 +176,7 @@ class ProductDetailView(PurposeRequiredMixin, UserPassesTestMixin, DetailView):
 class ProductCreateView(VendorRequiredMixin, CreateView):
     model = Product
     template_name = "mainpage/product_create.html"
-    fields = ["image", "title", "description", "price", "quantity", "discount"]
+    fields = ["image", "title", "description", "price", "quantity", "discount", "category", "location"]
 
     def form_valid(self, form):
         form.instance.vendor = self.request.user
@@ -135,7 +189,7 @@ class ProductCreateView(VendorRequiredMixin, CreateView):
 class ProductUpdateView(VendorRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Product
     template_name = "mainpage/product_edit.html"
-    fields = fields = ["image", "title", "description", "price", "quantity", "discount"]
+    fields = fields = ["image", "title", "description", "price", "quantity", "discount", "category", "location"]
 
     def form_valid(self, form):
         form.instance.vendor = self.request.user

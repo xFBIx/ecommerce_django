@@ -4,7 +4,20 @@ from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
 from PIL import Image
 
-
+CATEGORY_CHOICES = [
+    ("Sofas", "Sofas"),
+    ("Chairs", "Chairs"),
+    ("Tables", "Tables"),
+    ("Beds", "Beds"),
+    ("Cupboards", "Cupboards"),
+]
+LOCATION_CHOICES = [
+    ("Ahmedabad", "Ahmedabad"),
+    ("Bangalore", "Bangalore"),
+    ("Delhi", "Delhi"),
+    ("Mumbai", "Mumbai"),
+    ("Pune", "Pune"),
+]
 class Product(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -13,6 +26,8 @@ class Product(models.Model):
     price = models.FloatField(
         validators=[MinValueValidator(0.0)], null=False, blank=False
     )
+    category = models.CharField(max_length=100, choices=CATEGORY_CHOICES, null=True)
+    location = models.CharField(max_length=100, choices=LOCATION_CHOICES, null=True)
     quantity = models.PositiveIntegerField(null=False, blank=False)
     discount = models.FloatField(
         validators=[MinValueValidator(0.0), MaxValueValidator(99)], default=0
@@ -31,6 +46,31 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def filter_products(self, search=None, category=None, location=None, min_price=None, max_price=None):
+        queryset = self.objects.all()
+
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(description__icontains=search) |
+                Q(category__icontains=search) |
+                Q(location__icontains=search)
+            )
+        
+        if category:
+            queryset = queryset.filter(category=category)
+        
+        if location:
+            queryset = queryset.filter(location=location)
+        
+        if min_price is not None:
+            queryset = queryset.filter(price__gte=min_price)
+        
+        if max_price is not None:
+            queryset = queryset.filter(price__lte=max_price)
+        
+        return queryset
 
     def get_absolute_url(self):
         return reverse("product-detail", kwargs={"pk": self.pk})

@@ -18,6 +18,37 @@
 
 {% if customer %}
 	<section class="products section bg-gray">
+        <div class="container">
+            <div class="row">
+                <!-- Add the filter form here -->
+                <form method="GET" action="{% url 'customer-homepage' %}" class="form-inline">
+    <input type="text" name="search" placeholder="Search products" value="{{ request.GET.search }}" class="form-control">
+    
+    <select name="category" multiple class="form-control">
+        {% for category in CATEGORY_CHOICES %}
+            <option value="{{ category.0 }}" {% if category.0 in selected_categories %}selected{% endif %}>{{ category.1 }}</option>
+        {% endfor %}
+    </select>
+    
+    <select name="location" multiple class="form-control">
+        {% for location in LOCATION_CHOICES %}
+            <option value="{{ location.0 }}" {% if location.0 in selected_locations %}selected{% endif %}>{{ location.1 }}</option>
+        {% endfor %}
+    </select>
+    
+    <input type="number" name="min_price" placeholder="Min Price" value="{{ request.GET.min_price }}" class="form-control">
+    <input type="number" name="max_price" placeholder="Max Price" value="{{ request.GET.max_price }}" class="form-control">
+    
+    <button type="submit" class="btn btn-main">Filter</button>
+</form>
+                <!-- End of filter form -->
+    	<a href="{% url 'customer-homepage' %}?clear_filters=1" class="btn btn-secondary">Clear All Filters</a>
+            </div>
+            <!-- Rest of the product listing code -->
+        </div>
+    </section>
+	{% if customer_products %}
+	<section class="products section bg-gray">
 		<div class="container">
 			<div class="row">
 				<div class="title text-center">
@@ -53,9 +84,9 @@
 						<div class="product-content">
 							<h4><a href="{% url 'product-detail' product.id %}">{{ product.title }}</a></h4>
 							{% if product.discount %}
-							<p class="price"><span  style='text-decoration : line-through'>Rs.{{ product.price }}</span><span> Rs.{{ product.discounted_price }}</span></p>
+							<p class="price"><span  style='text-decoration : line-through'>Rs.{{ product.price }}/month</span><span> Rs.{{ product.discounted_price }}/month</span></p>
 							{% else %}
-							<p class="price">Rs.{{ product.price }}</p>
+							<p class="price">Rs.{{ product.price }}/month</p>
 							{% endif %}
 						</div>
 					</div>
@@ -84,11 +115,23 @@
 		  <a class="btn btn-outline-info mb-4" href="?page={{ customer_products.paginator.num_pages }}">Last</a>
 		{% endif %}
   
-		  {% endif %}
+		{% endif %}
 		</div>
 
 		</div>
 	</section>
+	{% else %}
+	<section class="empty-cart page-wrapper">
+	<div class="container">
+	  	<div class="row">
+			<div class="col-md-6 col-md-offset-3">
+		  		<div class="block text-center">
+					<h2 class="text-center">No Products Available for these filters!</h2>
+				</div>
+	  		</div>
+		</div>
+</section>
+	{% endif %}
 {% endif %}
 
 <!-- VENDOR HOMEPAGE -->
@@ -130,7 +173,7 @@
 							{% if product.discount %}
 							<p class="price"><span  style='text-decoration : line-through'>Rs.{{ product.price }}</span><span> Rs.{{ product.discounted_price }}</span></p>
 							{% else %}
-							<p class="price">Rs.{{ product.price }}</p>
+							<p class="price">Rs.{{ product.price }}/month</p>
 							{% endif %}
 						</div>
 					</div>

@@ -40,12 +40,12 @@
 					<h1>{{ object.title }}</h1>
 					<br>
 					{% if object.discount %}
-					<p class="product-price"><h3 style='text-decoration : line-through'>Rs.{{ object.price }}</h3>
+					<p class="product-price"><h3 style='text-decoration : line-through'>Rs.{{ object.price }}/month</h3>
 						<h5>{{ object.discount }}% OFF</h5>
-						<h2>Rs.{{ object.discounted_price }}</h2>
+						<h2>Rs.{{ object.discounted_price }}/month</h2>
 					</p>
 					{% else %}
-					<p class="product-price"><h3>Rs.{{ object.price }}</h3></p>
+					<p class="product-price"><h3>Rs.{{ object.price }}/month</h3></p>
 					{% endif %}
 					<br>
 					<div class="color-swatches">
@@ -74,8 +74,7 @@
 					<div class="product-category">
 						<span>Categories:</span>
 						<ul>
-							<li><a>Products</a></li>
-							<li><a>Soap</a></li>
+							<li><a>{{object.category}}</a></li>
 						</ul>
 					</div>
 					<div class="product-category">
@@ -88,6 +87,12 @@
 						<span>Quantity Available:</span>
 						<ul>
 							<li>{{ object.quantity }}</li>
+						</ul>
+					</div>
+					<div class="product-category">
+						<span>Location:</span>
+						<ul>
+							<li><a>{{object.location}}</a></li>
 						</ul>
 					</div>
 					{% if object.discount %}
