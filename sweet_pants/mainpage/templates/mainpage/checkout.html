@@ -53,13 +53,13 @@
       <div class="row">
         <div class="">
           <div class="block">
-            <div class="product-list">
+            <div class="book-list">
 				<h3>ORDER SUMMARY</h3>
                 <table class="table">
                   <thead>
                     <tr>
-                      <th class="">Product Name</th>
-                      <th class="">Product Price</th>
+                      <th class="">Book Name</th>
+                      <th class="">Book Price</th>
                       <th class="">Quantity</th>
 					  <th class="">Librarian Name</th>
                     </tr>
@@ -68,13 +68,13 @@
                   <tbody>
                     <tr class="">
                       <td class="">
-                        <div class="product-info">
+                        <div class="book-info">
 							{% if item.item.image %}
 							<img width="80" src="{{ item.item.image.url }}" alt="" />
 				            {% else %}
-                            <img width="80" src="{% static 'mainpage/images/default-product.jpeg' %}" alt="" />
+                            <img width="80" src="{% static 'mainpage/images/default-book.jpeg' %}" alt="" />
 			            	{% endif %}
-                          <a href="{% url 'product-detail' item.item.id %}">{{ item.item.title }}</a>
+                          <a href="{% url 'book-detail' item.item.id %}">{{ item.item.title }}</a>
                         </div>
                       </td>
                       {% if item.item.discount %}
@@ -92,7 +92,7 @@
 					  </td>
 					  <td class="">
 						{% if item.is_coupon %}
-						<a class="product-remove" href="{% url 'removecoupon' item.item.id %}">Remove Coupon Code</a>
+						<a class="book-remove" href="{% url 'removecoupon' item.item.id %}">Remove Coupon Code</a>
 						{% else %}
 						<a href="{% url 'coupon' item.item.id %}">Apply Coupon here!</a>
 						{% endif %}

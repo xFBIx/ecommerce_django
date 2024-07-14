@@ -4,7 +4,7 @@ Website Link : www.detrace.systems/ecommerce/
 
 # E-commerce App
 
-A comprehensive online marketplace built with Django, designed for vendors to sell products and customers to make purchases. This project evolves through various stages to enhance functionality and user experience.
+A comprehensive online marketplace built with Django, designed for vendors to sell books and customers to make purchases. This project evolves through various stages to enhance functionality and user experience.
 
 ## Overview
 
@@ -13,14 +13,14 @@ This repository hosts an e-commerce application with the following capabilities:
 - **Authentication and User Management:**
 
   - Utilizes Django's authentication system to manage vendors and customers separately.
-  - Librarians can register and manage their product listings.
+  - Librarians can register and manage their book listings.
   - Users can register, view orders, and manage their profiles.
 
 - **Core Functionality:**
 
-  - Database models structured for efficient management of users, products, orders, and reviews.
-  - Supports vendor actions such as adding and deleting products, and viewing orders related to their products.
-  - Users can add funds to their accounts and place orders based on available funds and product availability.
+  - Database models structured for efficient management of users, books, orders, and reviews.
+  - Supports vendor actions such as adding and deleting books, and viewing orders related to their books.
+  - Users can add funds to their accounts and place orders based on available funds and book availability.
   - Implements a home page listing all available items with top-selling items prioritized.
 
 - **Additional Features:**
@@ -33,7 +33,7 @@ This repository hosts an e-commerce application with the following capabilities:
   - Wishlist functionality for customers to save desired items for future purchase.
 
 - **Deployment:**
-  - Deployed on DigitalOcean using Docker, Nginx, and Gunicorn for production readiness.
+  - Deployed on DigitalOcean using Docker, Nginx, and Gunicorn for bookion readiness.
   - Provides a scalable and secure environment for hosting the application.
 
 ## Setup
@@ -46,7 +46,7 @@ To set up the project:
    ```python
    # Django settings
    SECRET_KEY = 'your_secret_key_here'
-   DEBUG = True  # Set to False in production
+   DEBUG = True  # Set to False in bookion
 
    # Google Allauth
    CLIENT_ID = 'your_google_client_id'
@@ -57,7 +57,7 @@ To set up the project:
    MJ_APIKEY_PRIVATE = 'your_mailjet_private_key'
    ```
 
-3. Configure Django settings as per your environment (development or production).
+3. Configure Django settings as per your environment (development or bookion).
 4. Set up Django admin groups 'User' and 'Librarian' for user permissions.
 
 ## Usage

@@ -24,21 +24,21 @@
       <div class="row">
         <div class="">
           <div class="block">
-            <div class="product-list">
+            <div class="book-list">
               <form method="post">
                 <table class="table">
                   <thead>
                     <tr>
                       <th class="">Librarian Name</th>
                       <th class="">Email Address</th>
-                      <th class="">Products by this Librarian</th>
+                      <th class="">Books by this Librarian</th>
                     </tr>
                   </thead>
                   {% for vendor in vendors %}
                   <tbody>
                     <tr class="">
                       <td class="">
-                        <div class="product-info">
+                        <div class="book-info">
                           {% if vendor.profile_vendor.image %}
                           <img
                             width="80"
@@ -58,8 +58,8 @@
 
                       <td class="">{{ vendor.email }}</td>
                       <td class="">
-                        <a class="" href="{% url 'vendor_products' vendor.id %}"
-                          >Products</a
+                        <a class="" href="{% url 'vendor_books' vendor.id %}"
+                          >Books</a
                         >
                       </td>
                     </tr>

@@ -2,18 +2,18 @@ from django.urls import path
 from .views import (
     BookDetailView,
     BookListView,
-    ProductUpdateView,
-    ProductDeleteView,
+    BookUpdateView,
+    BookDeleteView,
 )
 from . import views
 
 urlpatterns = [
-    # path("", ProductListView.as_view(), name="book_list"),
+    # path("", BookListView.as_view(), name="book_list"),
     path("books/", BookListView.as_view(), name="book_list"),
-    path("product/<int:pk>/", BookDetailView.as_view(), name="book-detail"),
-    path("product/new/", views.add_book, name="product-create"),
-    path("product/<int:pk>/edit/", ProductUpdateView.as_view(), name="book-edit"),
-    path("product/<int:pk>/delete/", ProductDeleteView.as_view(), name="book-delete"),
+    path("book/<int:pk>/", BookDetailView.as_view(), name="book-detail"),
+    path("book/new/", views.add_book, name="book-create"),
+    path("book/<int:pk>/edit/", BookUpdateView.as_view(), name="book-edit"),
+    path("book/<int:pk>/delete/", BookDeleteView.as_view(), name="book-delete"),
     path("add_to_wishlist/<int:pk>", views.add_to_wishlist, name="add_to_wishlist"),
     path("shoppingcart/", views.shoppingcart, name="shoppingcart"),
     path("remove_wishlist/<int:pk>", views.remove_wishlist, name="remove_wishlist"),
@@ -24,7 +24,7 @@ urlpatterns = [
     ),
     path("wishlist/", views.wishlist, name="wishlist"),
     path("vendors/", views.vendors, name="vendors"),
-    path("vendors/<int:pk>", views.vendor_products, name="vendor_products"),
+    path("vendors/<int:pk>", views.vendor_books, name="vendor_books"),
     path("checkout/", views.checkout, name="checkout"),
     path("buynow/", views.buynow, name="buynow"),
     path("orders-customer/", views.orderscustomer, name="orders-customer"),

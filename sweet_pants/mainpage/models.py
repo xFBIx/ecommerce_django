@@ -5,40 +5,63 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from PIL import Image
 
 
-class Product(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    image = models.ImageField(null=True, blank=True, upload_to="product_pics")
-    vendor = models.ForeignKey(User, on_delete=models.CASCADE)
-    price = models.FloatField(
-        validators=[MinValueValidator(0.0)], null=False, blank=False
-    )
-    quantity = models.PositiveIntegerField(null=False, blank=False)
-    discount = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(99)], default=0
-    )
-    sales = models.PositiveIntegerField(default=0)
-    discounted_price = models.FloatField(default=0)
-
-    def save(self, *args, **kwargs):
-        super(Product, self).save(*args, **kwargs)
-        if self.image:
-            img = Image.open(self.image.path)
-            if img.height > 600 or img.width > 500:
-                output_size = (600, 500)
-                img.thumbnail(output_size)
-                img.save(self.image.path)
+class Book(models.Model):
+    isbn_10 = models.CharField(max_length=10, blank=True, null=True)
+    isbn_13 = models.CharField(max_length=13, unique=True)
+    title = models.CharField(max_length=200)
+    subtitle = models.CharField(max_length=200, blank=True, null=True)
+    authors = models.CharField(max_length=200, null=True)
+    publisher = models.CharField(max_length=100)
+    published_date = models.CharField(max_length=20, null=True)
+    description = models.TextField(blank=True, null=True)
+    page_count = models.IntegerField(blank=True, null=True)
+    categories = models.CharField(max_length=200, blank=True, null=True)
+    language = models.CharField(max_length=10, blank=True, null=True)
+    preview_link = models.URLField(max_length=500, blank=True, null=True)
+    info_link = models.URLField(max_length=500, blank=True, null=True)
+    small_thumbnail = models.URLField(max_length=500, blank=True, null=True)
+    thumbnail = models.URLField(max_length=500, blank=True, null=True)
+    quantity = models.IntegerField(default=1)
+    available = models.IntegerField(default=1)
 
     def __str__(self):
         return self.title
 
-    def get_absolute_url(self):
-        return reverse("product-detail", kwargs={"pk": self.pk})
+
+# class Book(models.Model):
+#     title = models.CharField(max_length=100)
+#     description = models.TextField()
+#     image = models.ImageField(null=True, blank=True, upload_to="book_pics")
+#     vendor = models.ForeignKey(User, on_delete=models.CASCADE)
+#     price = models.FloatField(
+#         validators=[MinValueValidator(0.0)], null=False, blank=False
+#     )
+#     quantity = models.PositiveIntegerField(null=False, blank=False)
+#     discount = models.FloatField(
+#         validators=[MinValueValidator(0.0), MaxValueValidator(99)], default=0
+#     )
+#     sales = models.PositiveIntegerField(default=0)
+#     discounted_price = models.FloatField(default=0)
+
+#     def save(self, *args, **kwargs):
+#         super(Book, self).save(*args, **kwargs)
+#         if self.image:
+#             img = Image.open(self.image.path)
+#             if img.height > 600 or img.width > 500:
+#                 output_size = (600, 500)
+#                 img.thumbnail(output_size)
+#                 img.save(self.image.path)
+
+#     def __str__(self):
+#         return self.title
+
+#     def get_absolute_url(self):
+#         return reverse("book-detail", kwargs={"pk": self.pk})
 
 
 class Items(models.Model):
     customer = models.ForeignKey(User, default=1, on_delete=models.CASCADE)
-    item = models.ForeignKey(Product, on_delete=models.CASCADE)
+    item = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)], default=1)
     is_ordered = models.BooleanField(default=False)
     orderdate = models.DateTimeField(null=True, blank=True)
@@ -81,7 +104,7 @@ class ShoppingCart(models.Model):
 
 class Wishlist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    items = models.ManyToManyField(Product, blank=True)
+    items = models.ManyToManyField(Book, blank=True)
 
     def __str__(self):
         return self.user.username
@@ -89,37 +112,12 @@ class Wishlist(models.Model):
 
 class Review(models.Model):
     customer = models.ForeignKey(User, default=1, on_delete=models.CASCADE)
-    product = models.ForeignKey(
-        Product, related_name="reviews", on_delete=models.CASCADE
-    )
+    book = models.ForeignKey(Book, related_name="reviews", on_delete=models.CASCADE)
     description = models.TextField()
     date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return self.product.title
-
-
-class Book(models.Model):
-    isbn_10 = models.CharField(max_length=10, blank=True, null=True)
-    isbn_13 = models.CharField(max_length=13, unique=True)
-    title = models.CharField(max_length=200)
-    subtitle = models.CharField(max_length=200, blank=True, null=True)
-    authors = models.CharField(max_length=200, null=True)
-    publisher = models.CharField(max_length=100)
-    published_date = models.CharField(max_length=20, null=True)
-    description = models.TextField(blank=True, null=True)
-    page_count = models.IntegerField(blank=True, null=True)
-    categories = models.CharField(max_length=200, blank=True, null=True)
-    language = models.CharField(max_length=10, blank=True, null=True)
-    preview_link = models.URLField(max_length=500, blank=True, null=True)
-    info_link = models.URLField(max_length=500, blank=True, null=True)
-    small_thumbnail = models.URLField(max_length=500, blank=True, null=True)
-    thumbnail = models.URLField(max_length=500, blank=True, null=True)
-    quantity = models.IntegerField(default=1)
-    available = models.IntegerField(default=1)
-
-    def __str__(self):
-        return self.title
+        return self.book.title
 
 
 from django.db import models

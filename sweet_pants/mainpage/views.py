@@ -7,7 +7,7 @@ from django.views.generic import (
     UpdateView,
     DeleteView,
 )
-from .models import Product, Items, Review
+from .models import Book, Items, Review
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from users.decorators import LibrarianRequiredMixin, is_purpose, PurposeRequiredMixin
@@ -90,7 +90,7 @@ from .models import Book, BorrowRecord
 
 class BookDetailView(LoginRequiredMixin, DetailView):
     model = Book
-    template_name = "mainpage/product_detail.html"
+    template_name = "mainpage/book_detail.html"
     context_object_name = "book"
 
     def get_context_data(self, **kwargs):
@@ -144,7 +144,7 @@ def add_book(request):
         isbn = request.POST.get("isbn")
         if not isbn:
             messages.error(request, "Please provide an ISBN.")
-            return render(request, "mainpage/product_create.html")
+            return render(request, "mainpage/book_create.html")
 
         response = requests.get(
             f"https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}"
@@ -154,12 +154,12 @@ def add_book(request):
             messages.error(
                 request, "Error connecting to Google Books API. Please try again later."
             )
-            return render(request, "mainpage/product_create.html")
+            return render(request, "mainpage/book_create.html")
 
         data = response.json()
         if "items" not in data or len(data["items"]) == 0:
             messages.error(request, f"No book found with ISBN {isbn}")
-            return render(request, "mainpage/product_create.html")
+            return render(request, "mainpage/book_create.html")
 
         book_data = data["items"][0]["volumeInfo"]
 
@@ -196,12 +196,12 @@ def add_book(request):
                 request, f"An error occurred while adding the book: {str(e)}"
             )
 
-    return render(request, "mainpage/product_create.html")
+    return render(request, "mainpage/book_create.html")
 
 
-class ProductUpdateView(LibrarianRequiredMixin, UserPassesTestMixin, UpdateView):
+class BookUpdateView(LibrarianRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Book
-    template_name = "mainpage/product_edit.html"
+    template_name = "mainpage/book_edit.html"
     fields = [
         "title",
         "authors",
@@ -228,19 +228,19 @@ class ProductUpdateView(LibrarianRequiredMixin, UserPassesTestMixin, UpdateView)
     #     return super().form_valid(form)
 
     def test_func(self):
-        # product = self.get_object()
-        # if self.request.user == product.vendor:
+        # book = self.get_object()
+        # if self.request.user == book.vendor:
         #     return True
         return True
 
 
-class ProductDeleteView(LibrarianRequiredMixin, UserPassesTestMixin, DeleteView):
+class BookDeleteView(LibrarianRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Book
-    template_name = "mainpage/product_delete.html"
+    template_name = "mainpage/book_delete.html"
     success_url = "/ecommerce/books/"
 
     def test_func(self):
-        # product = self.get_object()
+        # book = self.get_object()
         # if self.request.user.groups.name == "Librarian":
         #     return True
         return True
@@ -255,24 +255,24 @@ def vendors(request):
 
 @is_purpose
 @allowed_users(allowed_roles="notvendor")
-def vendor_products(request, pk):
+def vendor_books(request, pk):
     context = {
-        "products": Product.objects.all().filter(vendor=pk).order_by("-sales"),
+        "books": Book.objects.all().filter(vendor=pk).order_by("-sales"),
         "vendor": User.objects.all().filter(id=pk).first(),
     }
-    return render(request, "mainpage/vendor_products.html", context)
+    return render(request, "mainpage/vendor_books.html", context)
 
 
 @login_required
 @is_purpose
 @allowed_users(allowed_roles="User")
 def add_to_wishlist(request, pk):
-    item = Product.objects.filter(id=pk).first()
+    item = Book.objects.filter(id=pk).first()
     if item in request.user.wishlist.items.all():
-        messages.info(request, "Product is already present in the Wishlist")
+        messages.info(request, "Book is already present in the Wishlist")
         return redirect("book_list")
     request.user.wishlist.items.add(item)
-    messages.success(request, "Product successfully added to Wishlist")
+    messages.success(request, "Book successfully added to Wishlist")
     return redirect("book_list")
 
 
@@ -280,10 +280,10 @@ def add_to_wishlist(request, pk):
 @is_purpose
 @allowed_users(allowed_roles="User")
 def remove_wishlist(request, pk):
-    item_to_remove = Product.objects.filter(id=pk).first()
+    item_to_remove = Book.objects.filter(id=pk).first()
     if item_to_remove in request.user.wishlist.items.all():
         request.user.wishlist.items.remove(item_to_remove)
-        messages.success(request, "Product has been removed from Wishlist successfully")
+        messages.success(request, "Book has been removed from Wishlist successfully")
         return redirect("wishlist")
     else:
         return redirect("book_list")
@@ -312,13 +312,13 @@ def wishlist(request):
 @is_purpose
 @allowed_users(allowed_roles="User")
 def remove_shoppingcart(request, pk):
-    product = Product.objects.filter(id=pk).first()
+    book = Book.objects.filter(id=pk).first()
     item_to_delete = request.user.shoppingcart.orderitems.filter(
-        item=product, is_ordered=False
+        item=book, is_ordered=False
     )
     if item_to_delete.exists():
         item_to_delete[0].delete()
-        messages.success(request, "Product has been removed from Shopping Cart")
+        messages.success(request, "Book has been removed from Shopping Cart")
     return redirect("shoppingcart")
 
 
@@ -340,15 +340,15 @@ def checkout(request):
 @is_purpose
 @allowed_users(allowed_roles="User")
 def coupon(request, pk):
-    product = Product.objects.filter(id=pk).first()
-    item = request.user.shoppingcart.orderitems.get(item=product, is_ordered=False)
+    book = Book.objects.filter(id=pk).first()
+    item = request.user.shoppingcart.orderitems.get(item=book, is_ordered=False)
     if item.is_coupon == True:
         messages.warning(request, "Coupon code already applied")
         return redirect("checkout")
     else:
         if request.method == "POST":
             code = request.POST.get("coupon")
-            if product.vendor.profile_vendor.coupon == code:
+            if book.vendor.profile_vendor.coupon == code:
                 item.is_coupon = True
                 item.save()
                 messages.success(request, "Coupon code successfully applied!")
@@ -363,27 +363,25 @@ def coupon(request, pk):
 @is_purpose
 @allowed_users(allowed_roles="User")
 def addtocart(request, pk):
-    product = Product.objects.filter(id=pk).first()
+    book = Book.objects.filter(id=pk).first()
     if request.method == "POST":
-        quantity = int(request.POST.get("product-quantity"))
-        if not request.user.shoppingcart.orderitems.filter(
-            item=product, is_ordered=False
-        ):
-            if quantity > product.quantity:
+        quantity = int(request.POST.get("book-quantity"))
+        if not request.user.shoppingcart.orderitems.filter(item=book, is_ordered=False):
+            if quantity > book.quantity:
                 messages.warning(
                     request,
-                    f"{quantity} quantities of this product is not available please select lesser",
+                    f"{quantity} quantities of this book is not available please select lesser",
                 )
                 return redirect("wishlist")
             item = Items.objects.create(
-                item=product, quantity=quantity, customer=request.user
+                item=book, quantity=quantity, customer=request.user
             )
             request.user.shoppingcart.orderitems.add(item)
             request.user.shoppingcart.save()
-            messages.success(request, "Product successfully added to Shopping Cart")
+            messages.success(request, "Book successfully added to Shopping Cart")
             return redirect("wishlist")
         else:
-            messages.info(request, "Product is already present in your shopping cart")
+            messages.info(request, "Book is already present in your shopping cart")
             return redirect("wishlist")
     return render(request, "mainpage/addtocart.html")
 
@@ -392,22 +390,22 @@ def addtocart(request, pk):
 @is_purpose
 @allowed_users(allowed_roles="User")
 def updatecart(request, pk):
-    product = Product.objects.filter(id=pk).first()
+    book = Book.objects.filter(id=pk).first()
     if request.method == "POST":
-        quantity = int(request.POST.get("product-quantity"))
-        if request.user.shoppingcart.orderitems.filter(item=product, is_ordered=False):
-            if quantity > product.quantity:
+        quantity = int(request.POST.get("book-quantity"))
+        if request.user.shoppingcart.orderitems.filter(item=book, is_ordered=False):
+            if quantity > book.quantity:
                 messages.warning(
                     request,
-                    f"{quantity} quantities of this product is not available please select lesser",
+                    f"{quantity} quantities of this book is not available please select lesser",
                 )
                 return redirect("shoppingcart")
             data = request.user.shoppingcart.orderitems.filter(
-                item=product, is_ordered=False
+                item=book, is_ordered=False
             ).first()
             data.quantity = quantity
             data.save()
-            messages.success(request, "Product quantity has been successfully updated")
+            messages.success(request, "Book quantity has been successfully updated")
             return redirect("shoppingcart")
         else:
             return redirect("book_list")
@@ -418,8 +416,8 @@ def updatecart(request, pk):
 @is_purpose
 @allowed_users(allowed_roles="User")
 def removecoupon(request, pk):
-    product = Product.objects.filter(id=pk).first()
-    item = request.user.shoppingcart.orderitems.get(item=product, is_ordered=False)
+    book = Book.objects.filter(id=pk).first()
+    item = request.user.shoppingcart.orderitems.get(item=book, is_ordered=False)
     if item.is_coupon == False:
         messages.warning(request, "No coupon is applied!")
         return redirect("checkout")
@@ -430,7 +428,7 @@ def removecoupon(request, pk):
         return redirect("checkout")
 
 
-def mail(vendor_email, vendor, customer, quantity, product, amount):
+def mail(vendor_email, vendor, customer, quantity, book, amount):
     API_KEY = keyconfig.MJ_APIKEY_PUBLIC
     API_SECRET = keyconfig.MJ_APIKEY_PRIVATE
     mailjet = Client(auth=(API_KEY, API_SECRET), version="v3.1")
@@ -439,8 +437,8 @@ def mail(vendor_email, vendor, customer, quantity, product, amount):
             {
                 "From": {"Email": "rudradattdave@gmail.com", "Name": "Sweet Pants"},
                 "To": [{"Email": f"{vendor_email}", "Name": f"{vendor}"}],
-                "Subject": "New order has been placed for your product",
-                "TextPart": f"Greetings from Sweet Pants. {customer} has placed order for {quantity} pieces of {product} with total price of Rs.{amount}",
+                "Subject": "New order has been placed for your book",
+                "TextPart": f"Greetings from Sweet Pants. {customer} has placed order for {quantity} pieces of {book} with total price of Rs.{amount}",
             }
         ]
     }
@@ -459,7 +457,7 @@ def buynow(request):
             if item.quantity > item.item.quantity:
                 messages.warning(
                     request,
-                    f"{item.quantity} quantities of this product is not available please select lesser",
+                    f"{item.quantity} quantities of this book is not available please select lesser",
                 )
                 return redirect("checkout")
         if (
@@ -533,14 +531,14 @@ def ordersvendor(request):
 @is_purpose
 @allowed_users(allowed_roles="User")
 def review(request, pk):
-    product = Product.objects.filter(id=pk).first()
+    book = Book.objects.filter(id=pk).first()
     print(request.user.shoppingcart.orderitems.filter(is_ordered=True))
-    print(product)
-    if request.user.shoppingcart.orderitems.filter(item=product, is_ordered=True):
+    print(book)
+    if request.user.shoppingcart.orderitems.filter(item=book, is_ordered=True):
         if request.method == "POST":
             review = request.POST.get("review")
             Review.objects.create(
-                product=product,
+                book=book,
                 description=review,
                 date=datetime.now(),
                 customer=request.user,

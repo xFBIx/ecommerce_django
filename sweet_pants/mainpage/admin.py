@@ -1,15 +1,14 @@
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .models import Product, ShoppingCart, Wishlist, Items, Review, Book, BorrowRecord
+from .models import Book, ShoppingCart, Wishlist, Items, Review, Book, BorrowRecord
 from import_export import resources, fields
 from import_export.widgets import ForeignKeyWidget
 
-admin.site.register(Product)
+admin.site.register(Book)
 admin.site.register(ShoppingCart)
 admin.site.register(Wishlist)
 admin.site.register(Review)
-admin.site.register(Book)
 admin.site.register(BorrowRecord)
 
 
@@ -20,10 +19,10 @@ class LibrarianResource(resources.ModelResource):
         attribute="customer",
         widget=ForeignKeyWidget(User, field="username"),
     )
-    Product = fields.Field(
-        column_name="Product",
+    Book = fields.Field(
+        column_name="Book",
         attribute="item",
-        widget=ForeignKeyWidget(Product, field="title"),
+        widget=ForeignKeyWidget(Book, field="title"),
     )
 
     class Meta:
@@ -43,15 +42,15 @@ class ItemsResource(resources.ModelResource):
         attribute="customer",
         widget=ForeignKeyWidget(User, field="username"),
     )
-    Product = fields.Field(
-        column_name="Product",
+    Book = fields.Field(
+        column_name="Book",
         attribute="item",
-        widget=ForeignKeyWidget(Product, field="title"),
+        widget=ForeignKeyWidget(Book, field="title"),
     )
     Librarian = fields.Field(
         column_name="Librarian",
         attribute="item",
-        widget=ForeignKeyWidget(Product, field="vendor"),
+        widget=ForeignKeyWidget(Book, field="vendor"),
     )
 
     class Meta:

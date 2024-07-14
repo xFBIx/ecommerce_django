@@ -135,10 +135,10 @@
 					</li><!-- / Home -->
 
 					{% if request.user|has_group:'Librarian' %}
-					<!-- Add Product -->
+					<!-- Add Book -->
 					<li class="dropdown ">
-						<a href="{% url 'product-create' %}">Add Product</a>
-					</li><!-- / Add Product -->
+						<a href="{% url 'book-create' %}">Add Book</a>
+					</li><!-- / Add Book -->
 					
 					<!-- All Orders -->
 					<li class="dropdown ">

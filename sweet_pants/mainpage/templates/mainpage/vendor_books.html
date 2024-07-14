@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-<title>Sweet Pants | Librarian Products</title>
+<title>Sweet Pants | Librarian Books</title>
 {% endblock title %}
 
 {% block content %}
@@ -16,7 +16,7 @@
 					<ol class="breadcrumb">
 						<li><a href="{% url 'book_list' %}">Home</a></li>
 						<li><a href="{% url 'vendors' %}">vendors</a></li>
-						<li class="active">vendor products</li>
+						<li class="active">vendor books</li>
 					</ol>
 				</div>
 			</div>
@@ -24,12 +24,12 @@
 	</div>
 </section>
 
-{% if products %}
-	<section class="products section bg-gray">
+{% if books %}
+	<section class="books section bg-gray">
 		<div class="container">
 			<div class="row">
 				<div class="title text-center">
-					<h2>All Products by {{ vendor }}</h2>
+					<h2>All Books by {{ vendor }}</h2>
 				</div>
 				<div class="top-menu text-right list-inline">
 					<h5>Sort by Highest Selling</h5>
@@ -37,33 +37,33 @@
 				</div>
 			</div>
 			<div class="row">
-			{% for product in products %}
+			{% for book in books %}
 				<div class="col-md-4">
-					<div class="product-item">
-						<div class="product-thumb" style="height:60vh;">
-							{% if product.discount %}<span class="bage">{{ product.discount }}% OFF</span>{% endif %}
-							{% if product.image %}
-							<img class="img-responsive" style="height:60vh;" src="{{ product.image.url }}" alt="product-img" />
+					<div class="book-item">
+						<div class="book-thumb" style="height:60vh;">
+							{% if book.discount %}<span class="bage">{{ book.discount }}% OFF</span>{% endif %}
+							{% if book.image %}
+							<img class="img-responsive" style="height:60vh;" src="{{ book.image.url }}" alt="book-img" />
 							{% else %}
-							<img class="img-responsive" style="height:60vh;" src="{% static 'mainpage/images/default-product.jpeg' %}" alt="product-img" />
+							<img class="img-responsive" style="height:60vh;" src="{% static 'mainpage/images/default-book.jpeg' %}" alt="book-img" />
 							{% endif %}
 							<div class="preview-meta">
 								<ul>
 									<li>
-										<a href="{% url 'product-detail' product.id %}" ><i class="tf-ion-ios-search-strong"></i></a>
+										<a href="{% url 'book-detail' book.id %}" ><i class="tf-ion-ios-search-strong"></i></a>
 									</li>
 									<li>
-										<a href="{% url 'add_to_wishlist' product.id %}" ><i class="tf-ion-ios-heart"></i></a>
+										<a href="{% url 'add_to_wishlist' book.id %}" ><i class="tf-ion-ios-heart"></i></a>
 									</li>
 								</ul>
 							</div>
 						</div>
-						<div class="product-content">
-							<h4><a href="{% url 'product-detail' product.id %}">{{ product.title }}</a></h4>
-							{% if product.discount %}
-							<p class="price"><span  style='text-decoration : line-through'>Rs.{{ product.price }}</span><span> Rs.{{ product.discounted_price }}</span></p>
+						<div class="book-content">
+							<h4><a href="{% url 'book-detail' book.id %}">{{ book.title }}</a></h4>
+							{% if book.discount %}
+							<p class="price"><span  style='text-decoration : line-through'>Rs.{{ book.price }}</span><span> Rs.{{ book.discounted_price }}</span></p>
 							{% else %}
-							<p class="price">Rs.{{ product.price }}</p>
+							<p class="price">Rs.{{ book.price }}</p>
 							{% endif %}
 						</div>
 					</div>
@@ -78,7 +78,7 @@
 	  	<div class="row">
 			<div class="col-md-6 col-md-offset-3">
 		  		<div class="block text-center">
-					<h2 class="text-center">No products are sold by {{vendor}} currently!</h2>
+					<h2 class="text-center">No books are sold by {{vendor}} currently!</h2>
 					<a href="{% url 'vendors' %}" class="btn btn-main mt-20">GO BACK</a>
 				</div>
 	  		</div>

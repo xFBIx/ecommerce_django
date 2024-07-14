@@ -30,13 +30,13 @@
       <div class="row">
         <div class="">
           <div class="block">
-            <div class="product-list">
+            <div class="book-list">
               <form method="post">
                 <table class="table">
                   <thead>
                     <tr>
-                      <th class="">Product Name</th>
-                      <th class="">Product Price</th>
+                      <th class="">Book Name</th>
+                      <th class="">Book Price</th>
                       <th class="">Available Quantity</th>
                       <th class="">Quantity to Order</th>
                       <th class="">Actions</th>
@@ -46,13 +46,13 @@
                   <tbody>
                     <tr class="">
                       <td class="">
-                        <div class="product-info">
+                        <div class="book-info">
                           {% if item.item.image %}
 						            	<img width="80" src="{{ item.item.image.url }}" alt="" />
 				                   {% else %}
-                          <img width="80" src="{% static 'mainpage/images/default-product.jpeg' %}" alt="" />
+                          <img width="80" src="{% static 'mainpage/images/default-book.jpeg' %}" alt="" />
 			                  	{% endif %}
-                          <a href="{% url 'product-detail' item.item.id %}">{{ item.item.title }}</a>
+                          <a href="{% url 'book-detail' item.item.id %}">{{ item.item.title }}</a>
                         </div>
                       </td>
                       {% if item.item.discount %}
@@ -71,7 +71,7 @@
                         <a href="{% url 'updatecart' item.item.id %}">Update Quantity</a>
                       </td>
                       <td class="">
-                        <a class="product-remove" href="{% url 'remove_shoppingcart' item.item.id %}">Remove</a>
+                        <a class="book-remove" href="{% url 'remove_shoppingcart' item.item.id %}">Remove</a>
                       </td>
                     </tr>
                   </tbody>
