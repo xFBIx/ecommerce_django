@@ -31,10 +31,10 @@ DEBUG = config.Debug
 ALLOWED_HOSTS: List[str] = ["*"]
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS: List[str] = [
-    "https://detrace.systems",
-    "http://detrace.systems",
-    "https://www.detrace.systems",
-    "http://www.detrace.systems",
+    "https://odoo.detrace.systems",
+    "http://odoo.detrace.systems",
+    "https://odoo.www.detrace.systems",
+    "http://odoo.www.detrace.systems",
 ]
 
 INTERNAL_IPS = [
