@@ -1,21 +1,19 @@
 from django.urls import path
 from .views import (
-    ProductListView,
-    ProductDetailView,
-    ProductCreateView,
+    BookDetailView,
+    BookListView,
     ProductUpdateView,
     ProductDeleteView,
 )
 from . import views
 
 urlpatterns = [
-    path("", ProductListView.as_view(), name="customer-homepage"),
-    path("product/<int:pk>/", ProductDetailView.as_view(), name="product-detail"),
+    # path("", ProductListView.as_view(), name="book_list"),
+    path("books/", BookListView.as_view(), name="book_list"),
+    path("product/<int:pk>/", BookDetailView.as_view(), name="book-detail"),
     path("product/new/", views.add_book, name="product-create"),
-    path("product/<int:pk>/edit/", ProductUpdateView.as_view(), name="product-edit"),
-    path(
-        "product/<int:pk>/delete/", ProductDeleteView.as_view(), name="product-delete"
-    ),
+    path("product/<int:pk>/edit/", ProductUpdateView.as_view(), name="book-edit"),
+    path("product/<int:pk>/delete/", ProductDeleteView.as_view(), name="book-delete"),
     path("add_to_wishlist/<int:pk>", views.add_to_wishlist, name="add_to_wishlist"),
     path("shoppingcart/", views.shoppingcart, name="shoppingcart"),
     path("remove_wishlist/<int:pk>", views.remove_wishlist, name="remove_wishlist"),

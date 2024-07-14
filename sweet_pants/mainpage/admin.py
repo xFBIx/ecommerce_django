@@ -1,7 +1,7 @@
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .models import Product, ShoppingCart, Wishlist, Items, Review
+from .models import Product, ShoppingCart, Wishlist, Items, Review, Book, BorrowRecord
 from import_export import resources, fields
 from import_export.widgets import ForeignKeyWidget
 
@@ -9,6 +9,8 @@ admin.site.register(Product)
 admin.site.register(ShoppingCart)
 admin.site.register(Wishlist)
 admin.site.register(Review)
+admin.site.register(Book)
+admin.site.register(BorrowRecord)
 
 
 class LibrarianResource(resources.ModelResource):

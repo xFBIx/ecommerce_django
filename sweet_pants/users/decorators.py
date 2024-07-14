@@ -19,7 +19,7 @@ def is_purpose(view_func):
 def purpose(view_func):
     def wrapped_func(request, *args, **kwargs):
         if Group.objects.filter(user=request.user):
-            return redirect("customer-homepage")
+            return redirect("book_list")
         return view_func(request, *args, **kwargs)
 
     return wrapped_func
@@ -28,7 +28,7 @@ def purpose(view_func):
 def unauthenticated_user(view_func):
     def wrapped_func(request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect("customer-homepage")
+            return redirect("book_list")
         return view_func(request, *args, **kwargs)
 
     return wrapped_func
@@ -45,7 +45,7 @@ def allowed_users(allowed_roles=""):
             elif request.user.groups.all()[0].name == allowed_roles:
                 return view_func(request, *args, **kwargs)
             else:
-                return redirect("customer-homepage")
+                return redirect("book_list")
 
         return wrapped_func
 
@@ -59,7 +59,7 @@ class LibrarianRequiredMixin(AccessMixin):
         else:
             try:
                 if not request.user.groups.all()[0].name == "Librarian":
-                    return redirect("customer-homepage")
+                    return redirect("book_list")
             except:
                 return redirect("purpose")
 

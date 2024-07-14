@@ -37,119 +37,137 @@ def FAQ(request):
     return render(request, "mainpage/faq.html")
 
 
-class ProductListView(PurposeRequiredMixin, ListView):
-    model = Product
+from django.views.generic import ListView
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from .models import Book
+
+
+class BookListView(PurposeRequiredMixin, ListView):
+    model = Book
     template_name = "mainpage/index_c.html"
 
     def get_context_data(self, *args, **kwargs):
-        context = super(ProductListView, self).get_context_data(*args, **kwargs)
-        if self.request.user.groups.all():
-            if self.request.user.groups.all()[0].name == "Librarian":
-                context["vendor"] = "vendor"
+        context = super(BookListView, self).get_context_data(*args, **kwargs)
+
+        # Determine user role
+        if self.request.user.groups.exists():
+            user_group = self.request.user.groups.first().name
+            if user_group == "Librarian":
+                context["is_librarian"] = True
             else:
-                context["customer"] = "customer"
+                context["is_user"] = True
         else:
-            context["customer"] = "customer"
+            context["is_user"] = True
 
-        user_list = Product.objects.all().order_by("-sales")
-        page = self.request.GET.get("page", 1)
-
-        paginator = Paginator(user_list, 6)
+        # Paginate all books for users
+        all_books = Book.objects.all().order_by(
+            "-id"
+        )  # Assuming you want to order by most recent
+        user_page = self.request.GET.get("page", 1)
+        user_paginator = Paginator(all_books, 6)
         try:
-            users = paginator.page(page)
+            user_books = user_paginator.page(user_page)
         except PageNotAnInteger:
-            users = paginator.page(1)
+            user_books = user_paginator.page(1)
         except EmptyPage:
-            users = paginator.page(paginator.num_pages)
-        context["customer_products"] = users
+            user_books = user_paginator.page(user_paginator.num_pages)
+        context["user_books"] = user_books
 
-        userr_list = (
-            Product.objects.all().filter(vendor=self.request.user.id).order_by("-sales")
-        )
-        pagee = self.request.GET.get("page", 1)
+        # If librarian, add a separate list of all books (without pagination)
+        if context.get("is_librarian"):
+            context["all_books"] = all_books
 
-        paginatorr = Paginator(userr_list, 3)
-        try:
-            userss = paginatorr.page(pagee)
-        except PageNotAnInteger:
-            userss = paginatorr.page(1)
-        except EmptyPage:
-            userss = paginatorr.page(paginatorr.num_pages)
-        context["vendor_products"] = userss
         return context
 
 
-class ProductDetailView(PurposeRequiredMixin, UserPassesTestMixin, DetailView):
-    model = Product
+from django.views.generic import DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.utils import timezone
+from .models import Book, BorrowRecord
+
+
+class BookDetailView(LoginRequiredMixin, DetailView):
+    model = Book
     template_name = "mainpage/product_detail.html"
+    context_object_name = "book"
 
-    def post(self, request, pk, **kwargs):
-        product = Product.objects.filter(id=pk).first()
-        quantity = int(request.POST.get("product-quantity"))
-        if not request.user.shoppingcart.orderitems.filter(
-            item=product, is_ordered=False
-        ):
-            if quantity > product.quantity:
-                messages.warning(
-                    request,
-                    f"{quantity} quantities of this product is not available please select lesser",
-                )
-                return redirect("product-detail", pk=pk)
-            item = Items.objects.create(
-                item=product, quantity=quantity, customer=request.user
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        book = self.object
+
+        context["is_librarian"] = user.groups.filter(name="Librarian").exists()
+        context["user_has_borrowed"] = BorrowRecord.objects.filter(
+            user=user, book=book, is_returned=False
+        ).exists()
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        book = self.get_object()
+        user = request.user
+
+        if not book.available:
+            messages.warning(
+                request, "This book is currently not available for borrowing."
             )
-            request.user.shoppingcart.orderitems.add(item)
-            request.user.shoppingcart.save()
-            messages.success(request, "Product successfully added to Shopping Cart")
-            return redirect("product-detail", pk=pk)
-        else:
-            messages.info(request, "Product is already present in your shopping cart")
-            return redirect("product-detail", pk=pk)
+            return redirect("book-detail", pk=book.pk)
 
-    def test_func(self):
-        product = self.get_object()
-        if self.request.user.groups.all():
-            if self.request.user.groups.all()[0].name == "Librarian":
-                if self.request.user == product.vendor:
-                    return True
-                return False
-            else:
-                return True
-        else:
-            return True
+        existing_borrow = BorrowRecord.objects.filter(
+            user=user, book=book, is_returned=False
+        ).exists()
 
+        if existing_borrow:
+            messages.info(request, "You have already borrowed this book.")
+            return redirect("book-detail", pk=book.pk)
 
-class ProductCreateView(LibrarianRequiredMixin, CreateView):
-    model = Product
-    template_name = "mainpage/product_create.html"
-    fields = ["image", "title", "description", "price", "quantity", "discount"]
-
-    def form_valid(self, form):
-        form.instance.vendor = self.request.user
-        form.instance.discounted_price = (
-            form.instance.price - form.instance.price * form.instance.discount / 100
+        BorrowRecord.objects.create(
+            user=user, book=book, due_date=timezone.now() + timezone.timedelta(days=14)
         )
-        return super().form_valid(form)
+
+        book.available -= 1
+        book.save()
+
+        messages.success(request, f"You have successfully borrowed '{book.title}'.")
+        return redirect("book-detail", pk=book.pk)
 
 
 import requests
 from .models import Book
+from django.db import IntegrityError
 
 
-@login_required
 def add_book(request):
     if request.method == "POST":
         isbn = request.POST.get("isbn")
-        # Fetch book data from Google Books API
+        if not isbn:
+            messages.error(request, "Please provide an ISBN.")
+            return render(request, "mainpage/product_create.html")
+
         response = requests.get(
             f"https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}"
         )
-        if response.status_code == 200:
-            book_data = response.json()["items"][0]["volumeInfo"]
-            # Create new book object
+
+        if response.status_code != 200:
+            messages.error(
+                request, "Error connecting to Google Books API. Please try again later."
+            )
+            return render(request, "mainpage/product_create.html")
+
+        data = response.json()
+        if "items" not in data or len(data["items"]) == 0:
+            messages.error(request, f"No book found with ISBN {isbn}")
+            return render(request, "mainpage/product_create.html")
+
+        book_data = data["items"][0]["volumeInfo"]
+
+        try:
             book = Book(
                 isbn_13=isbn,
-                title=book_data["title"],
+                title=book_data.get("title", ""),
+                subtitle=book_data.get("subtitle", ""),
                 authors=", ".join(book_data.get("authors", [])),
                 publisher=book_data.get("publisher", ""),
                 published_date=book_data.get("publishedDate", ""),
@@ -157,46 +175,75 @@ def add_book(request):
                 page_count=book_data.get("pageCount", 0),
                 categories=", ".join(book_data.get("categories", [])),
                 language=book_data.get("language", ""),
-                thumbnail=(
-                    book_data["imageLinks"].get("thumbnail", "")
-                    if "imageLinks" in book_data
-                    else ""
+                preview_link=book_data.get("previewLink", ""),
+                info_link=book_data.get("infoLink", ""),
+                small_thumbnail=book_data.get("imageLinks", {}).get(
+                    "smallThumbnail", ""
                 ),
+                thumbnail=book_data.get("imageLinks", {}).get("thumbnail", ""),
             )
             book.save()
+            messages.success(
+                request, f"Successfully added '{book.title}' to the library."
+            )
             return redirect("book_detail", book_id=book.id)
+        except IntegrityError:
+            messages.error(
+                request, f"A book with ISBN {isbn} already exists in the library."
+            )
+        except Exception as e:
+            messages.error(
+                request, f"An error occurred while adding the book: {str(e)}"
+            )
+
     return render(request, "mainpage/product_create.html")
 
 
 class ProductUpdateView(LibrarianRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Product
+    model = Book
     template_name = "mainpage/product_edit.html"
-    fields = fields = ["image", "title", "description", "price", "quantity", "discount"]
+    fields = [
+        "title",
+        "authors",
+        "publisher",
+        "published_date",
+        "description",
+        "page_count",
+        "categories",
+        "language",
+        "preview_link",
+        "info_link",
+        "small_thumbnail",
+        "thumbnail",
+        "quantity",
+        "available",
+    ]
+    success_url = "/ecommerce/books/"
 
-    def form_valid(self, form):
-        form.instance.vendor = self.request.user
-        form.instance.discounted_price = (
-            form.instance.price - form.instance.price * form.instance.discount / 100
-        )
-        return super().form_valid(form)
+    # def form_valid(self, form):
+    #     form.instance.vendor = self.request.user
+    #     form.instance.discounted_price = (
+    #         form.instance.price - form.instance.price * form.instance.discount / 100
+    #     )
+    #     return super().form_valid(form)
 
     def test_func(self):
-        product = self.get_object()
-        if self.request.user == product.vendor:
-            return True
-        return False
+        # product = self.get_object()
+        # if self.request.user == product.vendor:
+        #     return True
+        return True
 
 
 class ProductDeleteView(LibrarianRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Product
+    model = Book
     template_name = "mainpage/product_delete.html"
-    success_url = "/"
+    success_url = "/ecommerce/books/"
 
     def test_func(self):
-        product = self.get_object()
-        if self.request.user == product.vendor:
-            return True
-        return False
+        # product = self.get_object()
+        # if self.request.user.groups.name == "Librarian":
+        #     return True
+        return True
 
 
 @is_purpose
@@ -223,10 +270,10 @@ def add_to_wishlist(request, pk):
     item = Product.objects.filter(id=pk).first()
     if item in request.user.wishlist.items.all():
         messages.info(request, "Product is already present in the Wishlist")
-        return redirect("customer-homepage")
+        return redirect("book_list")
     request.user.wishlist.items.add(item)
     messages.success(request, "Product successfully added to Wishlist")
-    return redirect("customer-homepage")
+    return redirect("book_list")
 
 
 @login_required
@@ -239,7 +286,7 @@ def remove_wishlist(request, pk):
         messages.success(request, "Product has been removed from Wishlist successfully")
         return redirect("wishlist")
     else:
-        return redirect("customer-homepage")
+        return redirect("book_list")
 
 
 @login_required
@@ -363,7 +410,7 @@ def updatecart(request, pk):
             messages.success(request, "Product quantity has been successfully updated")
             return redirect("shoppingcart")
         else:
-            return redirect("customer-homepage")
+            return redirect("book_list")
     return render(request, "mainpage/updatecart.html")
 
 
@@ -454,7 +501,7 @@ def buynow(request):
 
         return render(request, "mainpage/confirmation.html")
     else:
-        return redirect("customer-homepage")
+        return redirect("book_list")
 
 
 @login_required

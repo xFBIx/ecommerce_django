@@ -17,12 +17,12 @@
             <form method="POST" enctype="multipart/form-data">
               {% csrf_token %}
               <fieldset class="form-group">
-                  <legend class="border-bottom mb-4">EDIT PRODUCT</legend>
+                  <legend class="border-bottom mb-4">EDIT BOOK</legend>
                   {{ form|crispy}}
               </fieldset>
               <div class="form-group">
                   <button class="btn btn-outline-info" type="submit">Make Changes</button>
-                  <a class="btn btn-outline-secondary" href="{% url 'product-detail' object.id %}">Cancel</a>
+                  <a class="btn btn-outline-secondary" href="{% url 'book-detail' object.id %}">Cancel</a>
               </div>
             </form>
         </div>

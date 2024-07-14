@@ -228,7 +228,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 LOGIN_REDIRECT_URL = "purpose"
 LOGIN_URL = "account_login"
-LOGOUT_REDIRECT_URL = "customer-homepage"
+LOGOUT_REDIRECT_URL = "book_list"
 
 
 ACCOUNT_EMAIL_REQUIRED = True

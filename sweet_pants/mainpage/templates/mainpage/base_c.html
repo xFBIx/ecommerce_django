@@ -55,7 +55,7 @@
 			<div class="col-md-4 col-xs-12 col-sm-4">
 				<!-- Site Logo -->
 				<div class="logo text-center">
-					<a href="{% url 'customer-homepage' %}">
+					<a href="{% url 'book_list' %}">
 						<!-- replace logo here -->
 						<svg width="500px" height="29px" viewBox="170 0 155 31" version="1.1" xmlns="http://www.w3.org/2000/svg"
 							xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -131,7 +131,7 @@
 
 					<!-- Home -->
 					<li class="dropdown ">
-						<a href="{% url 'customer-homepage' %}">Home</a>
+						<a href="{% url 'book_list' %}">Home</a>
 					</li><!-- / Home -->
 
 					{% if request.user|has_group:'Librarian' %}

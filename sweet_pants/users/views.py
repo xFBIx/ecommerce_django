@@ -32,7 +32,7 @@ def purpose(request):
                 Profile_vendor.objects.create(user=request.user)
                 request.user.profile_vendor.save()
 
-            return redirect("customer-homepage")
+            return redirect("book_list")
     context = {}
     context["form"] = purposeform()
     return render(request, "users/purpose.html", context)

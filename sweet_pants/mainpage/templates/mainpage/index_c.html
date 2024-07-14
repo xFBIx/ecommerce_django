@@ -1,182 +1,112 @@
 {% extends "mainpage/base_c.html" %}
-{% load post_tags %}
 {% load static %}
 
 {% block title %}
-{% if request.user|has_group:'nouser' %}
-<title>Sweet Pants | Homepage</title>
-{% elif request.user|has_group:'User'  %}
-<title>Sweet Pants | User Homepage</title>
-{% elif request.user|has_group:'Librarian' %}
-<title>Sweet Pants | Librarian Homepage</title>
+{% if request.user.groups.first.name == 'Librarian' %}
+<title>Library | Librarian Homepage</title>
+{% else %}
+<title>Library | User Homepage</title>
 {% endif %}
 {% endblock title %}
 
 {% block content %}
 
-<!-- CUSTOMER HOMEPAGE -->
+<section class="books section bg-gray">
+    <div class="container">
+        <div class="row">
+            <div class="title text-center">
+                <h2>Book Catalog</h2>
+            </div>
+        </div>
+        <div class="row">
+        {% for book in user_books %}
+            <div class="col-md-4">
+                <div class="book-item">
+                    <div class="book-thumb" style="height:60vh;">
+                        {% if book.thumbnail %}
+                        <img class="img-responsive" style="height:60vh;" src="{{ book.thumbnail }}" alt="book-img" />
+                        {% else %}
+                        <img class="img-responsive" style="height:60vh;" src="{% static 'mainpage/images/default-book.jpeg' %}" alt="book-img" />
+                        {% endif %}
+                        <div class="preview-meta">
+                            <ul>
+                                <li>
+                                    <a href="{% url 'book-detail' book.id %}" ><i class="tf-ion-ios-search-strong"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="book-content">
+                        <h4><a href="{% url 'book-detail' book.id %}">{{ book.title }}</a></h4>
+                        <p>by {{ book.authors }}</p>
+                        <p>Available: {{ book.available }} / {{ book.quantity }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
 
-{% if customer %}
-	<section class="products section bg-gray">
-		<div class="container">
-			<div class="row">
-				<div class="title text-center">
-					<h2>All Products</h2>
-				</div>
-				<div class="top-menu text-right list-inline">
-					<h5>Sort by Highest Selling</h5>
-					<br>
-				</div>
-			</div>
-			<div class="row">
-			{% for product in customer_products %}
-				<div class="col-md-4">
-					<div class="product-item">
-						<div class="product-thumb" style="height:60vh;">
-							{% if product.discount %}<span class="bage">{{ product.discount }}% OFF</span>{% endif %}
-							{% if product.image %}
-							<img class="img-responsive" style="height:60vh;" src="{{ product.image.url }}" alt="product-img" />
-							{% else %}
-							<img class="img-responsive" style="height:60vh;" src="{% static 'mainpage/images/default-product.jpeg' %}" alt="product-img" />
-							{% endif %}
-							<div class="preview-meta">
-								<ul>
-									<li>
-										<a href="{% url 'product-detail' product.id %}" ><i class="tf-ion-ios-search-strong"></i></a>
-									</li>
-									<li>
-										<a href="{% url 'add_to_wishlist' product.id %}" ><i class="tf-ion-ios-heart"></i></a>
-									</li>
-								</ul>
-							</div>
-						</div>
-						<div class="product-content">
-							<h4><a href="{% url 'product-detail' product.id %}">{{ product.title }}</a></h4>
-							{% if product.discount %}
-							<p class="price"><span  style='text-decoration : line-through'>Rs.{{ product.price }}</span><span> Rs.{{ product.discounted_price }}</span></p>
-							{% else %}
-							<p class="price">Rs.{{ product.price }}</p>
-							{% endif %}
-						</div>
-					</div>
-				</div>
-			{% endfor %}
-			</div>
-
-		<div class="block text-center">
-		{% if customer_products.has_other_pages %}
-
-		{% if customer_products.has_previous %}
-		  <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
-		  <a class="btn btn-outline-info mb-4" href="?page={{ customer_products.previous_page_number }}">Previous</a>
-		{% endif %}
-  
-		{% for num in customer_products.paginator.page_range %}
-		  {% if customer_products.number == num %}
-			<a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
-		  {% elif num > customer_products.number|add:'-3' and num < customer_products.number|add:'3' %}
-			<a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
-		  {% endif %}
-		{% endfor %}
-  
-		{% if customer_products.has_next %}
-		  <a class="btn btn-outline-info mb-4" href="?page={{ customer_products.next_page_number }}">Next</a>
-		  <a class="btn btn-outline-info mb-4" href="?page={{ customer_products.paginator.num_pages }}">Last</a>
-		{% endif %}
-  
-		  {% endif %}
-		</div>
-
-		</div>
-	</section>
-{% endif %}
-
-<!-- VENDOR HOMEPAGE -->
-
-{% if vendor %}
-{% if vendor_products %}
-	<section class="products section bg-gray">
-		<div class="container">
-			<div class="row">
-				<div class="title text-center">
-					<h2>Your Products</h2>
-				</div>
-				<div class="top-menu text-right list-inline">
-					<h5>Sort by Highest Selling</h5>
-					<br>
-				</div>
-			</div>
-			<div class="row">
-			{% for product in vendor_products %}
-				<div class="col-md-4">
-					<div class="product-item">
-						<div class="product-thumb" style="height:50vh;">
-							{% if product.discount %}<span class="bage">{{ product.discount }}% OFF</span>{% endif %}
-							{% if product.image %}
-							<img class="img-responsive" style="height:50vh;" src="{{ product.image.url }}" alt="product-img" />
-							{% else %}
-							<img class="img-responsive" style="height:50vh;" src="{% static 'mainpage/images/default-product.jpeg' %}" alt="product-img" />
-							{% endif %}
-							<div class="preview-meta">
-								<ul>
-									<li>
-										<a href="{% url 'product-detail' product.id %}" ><i class="tf-ion-ios-search-strong"></i></a>
-									</li>
-								</ul>
-							</div>
-						</div>
-						<div class="product-content">
-							<h4><a href="{% url 'product-detail' product.id %}">{{ product.title }}</a></h4>
-							{% if product.discount %}
-							<p class="price"><span  style='text-decoration : line-through'>Rs.{{ product.price }}</span><span> Rs.{{ product.discounted_price }}</span></p>
-							{% else %}
-							<p class="price">Rs.{{ product.price }}</p>
-							{% endif %}
-						</div>
-					</div>
-				</div>
-			{% endfor %}
-			</div>
-			
-			<div class="block text-center">
-			{% if vendor_products.has_other_pages %}
-
-		{% if vendor_products.has_previous %}
-		  <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
-		  <a class="btn btn-outline-info mb-4" href="?page={{ vendor_products.previous_page_number }}">Previous</a>
-		{% endif %}
-  
-		{% for num in vendor_products.paginator.page_range %}
-		  {% if vendor_products.number == num %}
-			<a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
-		  {% elif num > vendor_products.number|add:'-3' and num < vendor_products.number|add:'3' %}
-			<a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
-		  {% endif %}
-		{% endfor %}
-  
-		{% if vendor_products.has_next %}
-		  <a class="btn btn-outline-info mb-4" href="?page={{ vendor_products.next_page_number }}">Next</a>
-		  <a class="btn btn-outline-info mb-4" href="?page={{ vendor_products.paginator.num_pages }}">Last</a>
-		{% endif %}
-  
-		  {% endif %}
-			</div>
-
-		</div>
-	</section>
-{% else %}
-<section class="empty-cart page-wrapper">
-	<div class="container">
-	  	<div class="row">
-			<div class="col-md-6 col-md-offset-3">
-		  		<div class="block text-center">
-					<h2 class="text-center">You have no products, add a product to sell.</h2>
-					<a href="{% url 'product-create' %}" class="btn btn-main mt-20">ADD PRODUCT</a>
-				</div>
-	  		</div>
-		</div>
+        <div class="block text-center">
+        {% if user_books.has_other_pages %}
+            {% if user_books.has_previous %}
+              <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+              <a class="btn btn-outline-info mb-4" href="?page={{ user_books.previous_page_number }}">Previous</a>
+            {% endif %}
+      
+            {% for num in user_books.paginator.page_range %}
+              {% if user_books.number == num %}
+                <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+              {% elif num > user_books.number|add:'-3' and num < user_books.number|add:'3' %}
+                <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+              {% endif %}
+            {% endfor %}
+      
+            {% if user_books.has_next %}
+              <a class="btn btn-outline-info mb-4" href="?page={{ user_books.next_page_number }}">Next</a>
+              <a class="btn btn-outline-info mb-4" href="?page={{ user_books.paginator.num_pages }}">Last</a>
+            {% endif %}
+        {% endif %}
+        </div>
+    </div>
 </section>
-{% endif %}
+
+{% if is_librarian %}
+<section class="books section bg-gray">
+    <div class="container">
+        <div class="row">
+            <div class="title text-center">
+                <h2>All Books (Librarian View)</h2>
+            </div>
+        </div>
+        <div class="row">
+        {% for book in all_books %}
+            <div class="col-md-4">
+                <div class="book-item">
+                    <div class="book-thumb" style="height:50vh;">
+                        {% if book.thumbnail %}
+                        <img class="img-responsive" style="height:50vh;" src="{{ book.thumbnail }}" alt="book-img" />
+                        {% else %}
+                        <img class="img-responsive" style="height:50vh;" src="{% static 'mainpage/images/default-book.jpeg' %}" alt="book-img" />
+                        {% endif %}
+                        <div class="preview-meta">
+                            <ul>
+                                <li>
+                                    <a href="{% url 'book-detail' book.id %}" ><i class="tf-ion-ios-search-strong"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="book-content">
+                        <h4><a href="{% url 'book-detail' book.id %}">{{ book.title }}</a></h4>
+                        <p>by {{ book.authors }}</p>
+                        <p>Available: {{ book.available }} / {{ book.quantity }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+</section>
 {% endif %}
 
 {% endblock content %}
