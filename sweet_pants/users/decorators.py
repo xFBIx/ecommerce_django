@@ -3,61 +3,75 @@ from django.contrib.auth.models import Group
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import AccessMixin
 
+
 def is_purpose(view_func):
     def wrapped_func(request, *args, **kwargs):
-        try :
-            if Group.objects.filter(user = request.user):
+        try:
+            if Group.objects.filter(user=request.user):
                 return view_func(request, *args, **kwargs)
-            return redirect('purpose')
+            return redirect("purpose")
         except:
             return view_func(request, *args, **kwargs)
+
     return wrapped_func
+
 
 def purpose(view_func):
     def wrapped_func(request, *args, **kwargs):
-        if Group.objects.filter(user = request.user):
-            return redirect('customer-homepage')
+        if Group.objects.filter(user=request.user):
+            return redirect("customer-homepage")
         return view_func(request, *args, **kwargs)
+
     return wrapped_func
+
 
 def unauthenticated_user(view_func):
     def wrapped_func(request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('customer-homepage')
+            return redirect("customer-homepage")
         return view_func(request, *args, **kwargs)
+
     return wrapped_func
 
-def allowed_users(allowed_roles=''):
+
+def allowed_users(allowed_roles=""):
     def decorator(view_func):
         def wrapped_func(request, *args, **kwargs):
-            if allowed_roles == 'notvendor' and (not request.user.groups.all() or request.user.groups.all()[0].name == 'Customer'):
+            if allowed_roles == "notvendor" and (
+                not request.user.groups.all()
+                or request.user.groups.all()[0].name == "User"
+            ):
                 return view_func(request, *args, **kwargs)
             elif request.user.groups.all()[0].name == allowed_roles:
                 return view_func(request, *args, **kwargs)
             else:
-                return redirect('customer-homepage')
+                return redirect("customer-homepage")
+
         return wrapped_func
+
     return decorator
 
-class VendorRequiredMixin(AccessMixin):
+
+class LibrarianRequiredMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
         else:
             try:
-                if not request.user.groups.all()[0].name == 'Vendor':
-                    return redirect ('customer-homepage')
+                if not request.user.groups.all()[0].name == "Librarian":
+                    return redirect("customer-homepage")
             except:
-                return redirect('purpose')
-            
+                return redirect("purpose")
+
         return super().dispatch(request, *args, **kwargs)
-    
+
+
 class PurposeRequiredMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         try:
-            if Group.objects.filter(user = request.user) :
+            if Group.objects.filter(user=request.user):
                 return super().dispatch(request, *args, **kwargs)
             else:
-                return redirect('purpose')
+                return redirect("purpose")
         except:
             return super().dispatch(request, *args, **kwargs)

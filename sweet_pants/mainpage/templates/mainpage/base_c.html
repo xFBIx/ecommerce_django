@@ -134,7 +134,7 @@
 						<a href="{% url 'customer-homepage' %}">Home</a>
 					</li><!-- / Home -->
 
-					{% if request.user|has_group:'Vendor' %}
+					{% if request.user|has_group:'Librarian' %}
 					<!-- Add Product -->
 					<li class="dropdown ">
 						<a href="{% url 'product-create' %}">Add Product</a>
@@ -146,14 +146,14 @@
 					</li><!-- / All Orders -->
 					{% endif %}
 
-					{% if request.user|has_group:'Customer' or request.user|has_group:'nouser' %}
-					<!-- Vendors -->
+					{% if request.user|has_group:'User' or request.user|has_group:'nouser' %}
+					<!-- Librarians -->
 					<li class="dropdown ">
-						<a href="{% url 'vendors' %}">Vendors</a>
-					</li><!-- / Vendors -->
+						<a href="{% url 'vendors' %}">Librarians</a>
+					</li><!-- / Librarians -->
 					{% endif %}
 					
-					{% if request.user|has_group:'Customer' %}
+					{% if request.user|has_group:'User' %}
 					<!-- Orders -->
 					<li class="dropdown ">
 						<a href="{% url 'orders-customer' %}">Orders</a>
@@ -171,7 +171,7 @@
 					</li>
 					{% endif %}
 
-					{% if request.user|has_group:'Customer' or request.user|has_group:'Vendor' %}
+					{% if request.user|has_group:'User' or request.user|has_group:'Librarian' %}
 					<li class="dropdown dropdown-slide">
 						<a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="350"
 							role="button" aria-haspopup="true" aria-expanded="false">Account Details <span
@@ -179,7 +179,7 @@
 						<ul class="dropdown-menu">
 							<li><a href="{% url 'profile' %}">Profile Details</a></li>
 							<li><a href="{% url 'edit-profile' %}">EDIT Profile</a></li>
-							{% if request.user|has_group:'Vendor' %}
+							{% if request.user|has_group:'Librarian' %}
 							<li><a href="{% url 'profile' %}">Generate Coupon Code</a></li>
 							{% endif %}
 						</ul>
@@ -188,7 +188,7 @@
 
 					<li class="dropdown dropdown-slide">
 						<a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="350"
-							role="button" aria-haspopup="true" aria-expanded="false">Customer Care <span
+							role="button" aria-haspopup="true" aria-expanded="false">User Care <span
 								class="tf-ion-ios-arrow-down"></span></a>
 						<ul class="dropdown-menu">
 							<li><a href="{% url 'contact' %}">Contact Us</a></li>

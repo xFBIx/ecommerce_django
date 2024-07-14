@@ -10,43 +10,63 @@ admin.site.register(ShoppingCart)
 admin.site.register(Wishlist)
 admin.site.register(Review)
 
-class VendorResource(resources.ModelResource):
-    
-    Customer = fields.Field(
-        column_name='Customer',
-        attribute='customer',
-        widget=ForeignKeyWidget(User, field='username'))
+
+class LibrarianResource(resources.ModelResource):
+
+    User = fields.Field(
+        column_name="User",
+        attribute="customer",
+        widget=ForeignKeyWidget(User, field="username"),
+    )
     Product = fields.Field(
-        column_name='Product',
-        attribute='item',
-        widget=ForeignKeyWidget(Product, field='title'))
+        column_name="Product",
+        attribute="item",
+        widget=ForeignKeyWidget(Product, field="title"),
+    )
 
     class Meta:
         model = Items
-        exclude = ('id','customer','item','is_ordered', )
+        exclude = (
+            "id",
+            "customer",
+            "item",
+            "is_ordered",
+        )
+
 
 class ItemsResource(resources.ModelResource):
-    
-    Customer = fields.Field(
-        column_name='Customer',
-        attribute='customer',
-        widget=ForeignKeyWidget(User, field='username'))
+
+    User = fields.Field(
+        column_name="User",
+        attribute="customer",
+        widget=ForeignKeyWidget(User, field="username"),
+    )
     Product = fields.Field(
-        column_name='Product',
-        attribute='item',
-        widget=ForeignKeyWidget(Product, field='title'))
-    Vendor = fields.Field(
-        column_name='Vendor',
-        attribute='item',
-        widget=ForeignKeyWidget(Product, field='vendor'))
+        column_name="Product",
+        attribute="item",
+        widget=ForeignKeyWidget(Product, field="title"),
+    )
+    Librarian = fields.Field(
+        column_name="Librarian",
+        attribute="item",
+        widget=ForeignKeyWidget(Product, field="vendor"),
+    )
 
     class Meta:
         model = Items
-        exclude = ('id','customer','item','is_ordered', )
+        exclude = (
+            "id",
+            "customer",
+            "item",
+            "is_ordered",
+        )
+
 
 class ItemsAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     resource_classes = [ItemsResource]
+
     def get_export_queryset(self, request):
-            return Items.objects.filter(is_ordered=True)
-    
+        return Items.objects.filter(is_ordered=True)
+
+
 admin.site.register(Items, ItemsAdmin)

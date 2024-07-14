@@ -5,10 +5,10 @@
 {% block title %}
 {% if request.user|has_group:'nouser' %}
 <title>Sweet Pants | Homepage</title>
-{% elif request.user|has_group:'Customer'  %}
-<title>Sweet Pants | Customer Homepage</title>
-{% elif request.user|has_group:'Vendor' %}
-<title>Sweet Pants | Vendor Homepage</title>
+{% elif request.user|has_group:'User'  %}
+<title>Sweet Pants | User Homepage</title>
+{% elif request.user|has_group:'Librarian' %}
+<title>Sweet Pants | Librarian Homepage</title>
 {% endif %}
 {% endblock title %}
 

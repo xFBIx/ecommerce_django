@@ -97,3 +97,26 @@ class Review(models.Model):
 
     def __str__(self):
         return self.product.title
+
+
+class Book(models.Model):
+    isbn_10 = models.CharField(max_length=10, blank=True, null=True)
+    isbn_13 = models.CharField(max_length=13, unique=True)
+    title = models.CharField(max_length=200)
+    subtitle = models.CharField(max_length=200, blank=True, null=True)
+    authors = models.CharField(max_length=200, null=True)
+    publisher = models.CharField(max_length=100)
+    published_date = models.CharField(max_length=20, null=True)
+    description = models.TextField(blank=True, null=True)
+    page_count = models.IntegerField(blank=True, null=True)
+    categories = models.CharField(max_length=200, blank=True, null=True)
+    language = models.CharField(max_length=10, blank=True, null=True)
+    preview_link = models.URLField(max_length=500, blank=True, null=True)
+    info_link = models.URLField(max_length=500, blank=True, null=True)
+    small_thumbnail = models.URLField(max_length=500, blank=True, null=True)
+    thumbnail = models.URLField(max_length=500, blank=True, null=True)
+    quantity = models.IntegerField(default=1)
+    available = models.IntegerField(default=1)
+
+    def __str__(self):
+        return self.title

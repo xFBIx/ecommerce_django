@@ -79,7 +79,7 @@
 						</ul>
 					</div>
 					<div class="product-category">
-						<span>Vendor:</span>
+						<span>Librarian:</span>
 						<ul>
 							<li><a>{{ object.vendor }}</a></li>
 						</ul>
@@ -101,7 +101,7 @@
 					<form method='POST'>
 					{% csrf_token %}
 					<div class="product-quantity">
-						{% if request.user|has_group:'Customer' %}
+						{% if request.user|has_group:'User' %}
 						<span>Quantity:</span>
 						<div class="product-quantity-slider">
 							<input id="product-quantity"  type="text" value="1" name="product-quantity">
@@ -110,12 +110,12 @@
 						<span><button type="submit" class="btn btn-main btn-small btn-round">Add to Shopping Cart</button></span>
 						{% endif %}
 						<span></span>
-						{% if request.user|has_group:'Customer' or request.user|has_group:'nouser' %}
+						{% if request.user|has_group:'User' or request.user|has_group:'nouser' %}
 						<span><a href="{% url 'add_to_wishlist' object.id %}" class="btn btn-main btn-small btn-round">ADD TO WISHLIST</a></span>
 						{% endif %}
 					</div>
 					</form>
-					{% if request.user|has_group:'Vendor' %}
+					{% if request.user|has_group:'Librarian' %}
 					<ul class="list-inline dashboard-menu text-center">
 						<br>
 						<li class="li"><a href="{% url 'product-edit' object.id %}" class="btn btn-main btn-small btn-round">EDIT PRODUCT</a></li>

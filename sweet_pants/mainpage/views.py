@@ -10,12 +10,12 @@ from django.views.generic import (
 from .models import Product, Items, Review
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-from users.decorators import VendorRequiredMixin, is_purpose, PurposeRequiredMixin
+from users.decorators import LibrarianRequiredMixin, is_purpose, PurposeRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from users.decorators import allowed_users
 from datetime import datetime
-from .admin import VendorResource
+from .admin import LibrarianResource
 from django.http import HttpResponse
 from mailjet_rest import Client
 from sweet_pants import keyconfig
@@ -44,7 +44,7 @@ class ProductListView(PurposeRequiredMixin, ListView):
     def get_context_data(self, *args, **kwargs):
         context = super(ProductListView, self).get_context_data(*args, **kwargs)
         if self.request.user.groups.all():
-            if self.request.user.groups.all()[0].name == "Vendor":
+            if self.request.user.groups.all()[0].name == "Librarian":
                 context["vendor"] = "vendor"
             else:
                 context["customer"] = "customer"
@@ -109,7 +109,7 @@ class ProductDetailView(PurposeRequiredMixin, UserPassesTestMixin, DetailView):
     def test_func(self):
         product = self.get_object()
         if self.request.user.groups.all():
-            if self.request.user.groups.all()[0].name == "Vendor":
+            if self.request.user.groups.all()[0].name == "Librarian":
                 if self.request.user == product.vendor:
                     return True
                 return False
@@ -119,7 +119,7 @@ class ProductDetailView(PurposeRequiredMixin, UserPassesTestMixin, DetailView):
             return True
 
 
-class ProductCreateView(VendorRequiredMixin, CreateView):
+class ProductCreateView(LibrarianRequiredMixin, CreateView):
     model = Product
     template_name = "mainpage/product_create.html"
     fields = ["image", "title", "description", "price", "quantity", "discount"]
@@ -132,7 +132,43 @@ class ProductCreateView(VendorRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ProductUpdateView(VendorRequiredMixin, UserPassesTestMixin, UpdateView):
+import requests
+from .models import Book
+
+
+@login_required
+def add_book(request):
+    if request.method == "POST":
+        isbn = request.POST.get("isbn")
+        # Fetch book data from Google Books API
+        response = requests.get(
+            f"https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}"
+        )
+        if response.status_code == 200:
+            book_data = response.json()["items"][0]["volumeInfo"]
+            # Create new book object
+            book = Book(
+                isbn_13=isbn,
+                title=book_data["title"],
+                authors=", ".join(book_data.get("authors", [])),
+                publisher=book_data.get("publisher", ""),
+                published_date=book_data.get("publishedDate", ""),
+                description=book_data.get("description", ""),
+                page_count=book_data.get("pageCount", 0),
+                categories=", ".join(book_data.get("categories", [])),
+                language=book_data.get("language", ""),
+                thumbnail=(
+                    book_data["imageLinks"].get("thumbnail", "")
+                    if "imageLinks" in book_data
+                    else ""
+                ),
+            )
+            book.save()
+            return redirect("book_detail", book_id=book.id)
+    return render(request, "mainpage/product_create.html")
+
+
+class ProductUpdateView(LibrarianRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Product
     template_name = "mainpage/product_edit.html"
     fields = fields = ["image", "title", "description", "price", "quantity", "discount"]
@@ -151,7 +187,7 @@ class ProductUpdateView(VendorRequiredMixin, UserPassesTestMixin, UpdateView):
         return False
 
 
-class ProductDeleteView(VendorRequiredMixin, UserPassesTestMixin, DeleteView):
+class ProductDeleteView(LibrarianRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Product
     template_name = "mainpage/product_delete.html"
     success_url = "/"
@@ -166,7 +202,7 @@ class ProductDeleteView(VendorRequiredMixin, UserPassesTestMixin, DeleteView):
 @is_purpose
 @allowed_users(allowed_roles="notvendor")
 def vendors(request):
-    context = {"vendors": User.objects.all().filter(groups__name="Vendor")}
+    context = {"vendors": User.objects.all().filter(groups__name="Librarian")}
     return render(request, "mainpage/vendors.html", context)
 
 
@@ -182,7 +218,7 @@ def vendor_products(request, pk):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def add_to_wishlist(request, pk):
     item = Product.objects.filter(id=pk).first()
     if item in request.user.wishlist.items.all():
@@ -195,7 +231,7 @@ def add_to_wishlist(request, pk):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def remove_wishlist(request, pk):
     item_to_remove = Product.objects.filter(id=pk).first()
     if item_to_remove in request.user.wishlist.items.all():
@@ -208,7 +244,7 @@ def remove_wishlist(request, pk):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def shoppingcart(request):
     context = {
         "items": request.user.shoppingcart.orderitems.all().filter(is_ordered=False),
@@ -219,7 +255,7 @@ def shoppingcart(request):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def wishlist(request):
     context = {"items": request.user.wishlist.items.all()}
     return render(request, "mainpage/wishlist.html", context)
@@ -227,7 +263,7 @@ def wishlist(request):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def remove_shoppingcart(request, pk):
     product = Product.objects.filter(id=pk).first()
     item_to_delete = request.user.shoppingcart.orderitems.filter(
@@ -241,7 +277,7 @@ def remove_shoppingcart(request, pk):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def checkout(request):
     context = {
         "address": request.user.profile_customer.address,
@@ -255,7 +291,7 @@ def checkout(request):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def coupon(request, pk):
     product = Product.objects.filter(id=pk).first()
     item = request.user.shoppingcart.orderitems.get(item=product, is_ordered=False)
@@ -278,7 +314,7 @@ def coupon(request, pk):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def addtocart(request, pk):
     product = Product.objects.filter(id=pk).first()
     if request.method == "POST":
@@ -307,7 +343,7 @@ def addtocart(request, pk):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def updatecart(request, pk):
     product = Product.objects.filter(id=pk).first()
     if request.method == "POST":
@@ -333,7 +369,7 @@ def updatecart(request, pk):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def removecoupon(request, pk):
     product = Product.objects.filter(id=pk).first()
     item = request.user.shoppingcart.orderitems.get(item=product, is_ordered=False)
@@ -366,7 +402,7 @@ def mail(vendor_email, vendor, customer, quantity, product, amount):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def buynow(request):
     if request.user.shoppingcart.orderitems.all().filter(is_ordered=False):
         if not request.user.profile_customer.address:
@@ -423,7 +459,7 @@ def buynow(request):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def orderscustomer(request):
     context = {
         "orders": request.user.shoppingcart.orderitems.filter(is_ordered=True).order_by(
@@ -435,7 +471,7 @@ def orderscustomer(request):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Vendor")
+@allowed_users(allowed_roles="Librarian")
 def ordersvendor(request):
     items = Items.objects.filter(is_ordered=True).order_by("-orderdate")
     order = []
@@ -448,7 +484,7 @@ def ordersvendor(request):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Customer")
+@allowed_users(allowed_roles="User")
 def review(request, pk):
     product = Product.objects.filter(id=pk).first()
     print(request.user.shoppingcart.orderitems.filter(is_ordered=True))
@@ -471,9 +507,9 @@ def review(request, pk):
 
 @login_required
 @is_purpose
-@allowed_users(allowed_roles="Vendor")
+@allowed_users(allowed_roles="Librarian")
 def download_orders(request):
-    rawdata = VendorResource()
+    rawdata = LibrarianResource()
     queryset = Items.objects.filter(is_ordered=True).filter(item__vendor=request.user)
     dataset = rawdata.export(queryset)
     response = HttpResponse(dataset.xls, content_type="application/vnd.ms-excel")

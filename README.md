@@ -11,21 +11,24 @@ A comprehensive online marketplace built with Django, designed for vendors to se
 This repository hosts an e-commerce application with the following capabilities:
 
 - **Authentication and User Management:**
+
   - Utilizes Django's authentication system to manage vendors and customers separately.
-  - Vendors can register and manage their product listings.
-  - Customers can register, view orders, and manage their profiles.
+  - Librarians can register and manage their product listings.
+  - Users can register, view orders, and manage their profiles.
 
 - **Core Functionality:**
+
   - Database models structured for efficient management of users, products, orders, and reviews.
   - Supports vendor actions such as adding and deleting products, and viewing orders related to their products.
-  - Customers can add funds to their accounts and place orders based on available funds and product availability.
+  - Users can add funds to their accounts and place orders based on available funds and product availability.
   - Implements a home page listing all available items with top-selling items prioritized.
 
 - **Additional Features:**
+
   - Integration of OAuth for Google sign-in using Django Allauth.
   - Email notifications to vendors upon customer purchases, facilitated through Mailjet API.
   - Migration from SQLite to PostgreSQL for robust database management.
-  - Vendor ability to generate CSV/Excel reports of their sales history.
+  - Librarian ability to generate CSV/Excel reports of their sales history.
   - Enhanced ordering capability allowing customers to order multiple types of items simultaneously with a shopping cart model.
   - Wishlist functionality for customers to save desired items for future purchase.
 
@@ -55,7 +58,7 @@ To set up the project:
    ```
 
 3. Configure Django settings as per your environment (development or production).
-4. Set up Django admin groups 'Customer' and 'Vendor' for user permissions.
+4. Set up Django admin groups 'User' and 'Librarian' for user permissions.
 
 ## Usage
 

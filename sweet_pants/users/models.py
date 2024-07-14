@@ -20,7 +20,7 @@ class Profile_customer(models.Model):
                 img.save(self.image.path)
 
     def __str__(self):
-        return f"{self.user.username} Customer Profile"
+        return f"{self.user.username} User Profile"
 
 
 class Profile_vendor(models.Model):
@@ -41,4 +41,4 @@ class Profile_vendor(models.Model):
                 img.save(self.image.path)
 
     def __str__(self):
-        return f"{self.user.username} Vendor Profile"
+        return f"{self.user.username} Librarian Profile"
