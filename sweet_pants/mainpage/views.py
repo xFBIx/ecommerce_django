@@ -129,7 +129,13 @@ class BookDetailView(LoginRequiredMixin, DetailView):
 
         book.available -= 1
         book.save()
-
+        print(user.email)
+        mail(
+            user=user,
+            book=book,
+            due_date=timezone.now() + timezone.timedelta(days=14),
+            user_email=user.email,
+        )
         messages.success(request, f"You have successfully borrowed '{book.title}'.")
         return redirect("book-detail", pk=book.pk)
 
@@ -428,21 +434,23 @@ def removecoupon(request, pk):
         return redirect("checkout")
 
 
-def mail(vendor_email, vendor, customer, quantity, book, amount):
+def mail(user_email, user, book, due_date):
     API_KEY = keyconfig.MJ_APIKEY_PUBLIC
     API_SECRET = keyconfig.MJ_APIKEY_PRIVATE
     mailjet = Client(auth=(API_KEY, API_SECRET), version="v3.1")
     data = {
         "Messages": [
             {
-                "From": {"Email": "rudradattdave@gmail.com", "Name": "Sweet Pants"},
-                "To": [{"Email": f"{vendor_email}", "Name": f"{vendor}"}],
-                "Subject": "New order has been placed for your book",
-                "TextPart": f"Greetings from Sweet Pants. {customer} has placed order for {quantity} pieces of {book} with total price of Rs.{amount}",
+                "From": {"Email": "rudradattdave@gmail.com", "Name": "Library"},
+                "To": [{"Email": f"{user_email}", "Name": f"{user.username}"}],
+                "Subject": "Book Borrowed Successfully",
+                "TextPart": f"Greetings from Sweet Pants libraby management system. You have successfully borrowed the book {book.title}. Please return the book by {due_date}.",
             }
         ]
     }
     mailjet.send.create(data=data)
+    print("Mail sent successfully")
+    print(data)
 
 
 @login_required
@@ -560,3 +568,33 @@ def download_orders(request):
     response = HttpResponse(dataset.xls, content_type="application/vnd.ms-excel")
     response["Content-Discription"] = "attachment; filename='orders.xls'"
     return response
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from .models import BorrowRecord, Book
+
+
+@login_required
+def order_history(request):
+    borrow_records = BorrowRecord.objects.filter(user=request.user).order_by(
+        "-borrow_date"
+    )
+
+    if request.method == "POST":
+        record_id = request.POST.get("record_id")
+        record = get_object_or_404(BorrowRecord, id=record_id, user=request.user)
+
+        if not record.is_returned:
+            record.is_returned = True
+            record.return_date = timezone.now()
+            record.save()
+
+            book = record.book
+            book.available += 1
+            book.save()
+
+    return render(
+        request, "mainpage/order_history.html", {"borrow_records": borrow_records}
+    )

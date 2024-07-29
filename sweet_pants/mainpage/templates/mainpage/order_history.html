@@ -1,0 +1,42 @@
+{% extends "mainpage/base_c.html" %}
+
+{% block content %}
+<h1>Order History</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Book Title</th>
+            <th>Borrow Date</th>
+            <th>Due Date</th>
+            <th>Return Date</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in borrow_records %}
+        <tr>
+            <td>{{ record.book.title }}</td>
+            <td>{{ record.borrow_date }}</td>
+            <td>{{ record.due_date }}</td>
+            <td>{{ record.return_date|default_if_none:"-" }}</td>
+            <td>{% if record.is_returned %}Returned{% else %}Borrowed{% endif %}</td>
+            <td>
+                {% if not record.is_returned %}
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="record_id" value="{{ record.id }}">
+                    <button type="submit" class="btn btn-primary btn-sm">Return Book</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No borrow records found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

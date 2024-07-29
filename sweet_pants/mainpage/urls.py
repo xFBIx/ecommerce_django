@@ -9,7 +9,7 @@ from . import views
 
 urlpatterns = [
     # path("", BookListView.as_view(), name="book_list"),
-    path("books/", BookListView.as_view(), name="book_list"),
+    path("", BookListView.as_view(), name="book_list"),
     path("book/<int:pk>/", BookDetailView.as_view(), name="book-detail"),
     path("book/new/", views.add_book, name="book-create"),
     path("book/<int:pk>/edit/", BookUpdateView.as_view(), name="book-edit"),
@@ -27,7 +27,8 @@ urlpatterns = [
     path("vendors/<int:pk>", views.vendor_books, name="vendor_books"),
     path("checkout/", views.checkout, name="checkout"),
     path("buynow/", views.buynow, name="buynow"),
-    path("orders-customer/", views.orderscustomer, name="orders-customer"),
+    # path("orders-customer/", views.orderscustomer, name="orders-customer"),
+    path("order-history/", views.order_history, name="orders-customer"),
     path("orders-vendor/", views.ordersvendor, name="orders-vendor"),
     path(
         "orders-vendor/download-orders", views.download_orders, name="download-orders"

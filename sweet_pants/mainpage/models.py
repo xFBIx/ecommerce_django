@@ -112,7 +112,9 @@ class Wishlist(models.Model):
 
 class Review(models.Model):
     customer = models.ForeignKey(User, default=1, on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, related_name="reviews", on_delete=models.CASCADE)
+    book = models.ForeignKey(
+        Book, related_name="reviews", on_delete=models.CASCADE, null=True
+    )
     description = models.TextField()
     date = models.DateTimeField(null=True, blank=True)
 
